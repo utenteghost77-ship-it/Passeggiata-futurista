@@ -1,0 +1,2893 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#14100c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pass. Futurista">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Passeggiata Futurista — Portogruaro</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --nero:#14100c;
+  --nero2:#1e1812;
+  --rosso:#d63c1e;
+  --rosso-d:  #a82c14;
+  --oro:#c9890a;
+  --oro-l:    #f5e4b0;
+  --crema:#f4ede0;
+  --crema2:#ede4d4;
+  --grigio:#3a3028;
+  --testo-sc: #1e1812;
+  --testo-m:  #5a4e40;
+  --testo-l:  #8a7a68;
+  --verde:#2a7a4a;
+  --verde-l:  #d4f0e0;
+  --radius:12px;
+  --radius-sm:7px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Nunito', system-ui, sans-serif;
+  background: var(--crema); color: var(--testo-sc); min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+#app { max-width: 500px; margin: 0 auto; position: relative; min-height: 100vh; }
+.page { display: none; flex-direction: column; min-height: 100vh; animation: fadeIn 0.28s ease; }
+.page.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.top-bar {
+  display: flex; align-items: center; gap: 0.7rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--nero);
+  border-bottom: 2px solid var(--rosso);
+  position: sticky; top: 0; z-index: 100;
+}
+.back-btn {
+  font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700;
+  color: var(--crema); background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18); border-radius: 6px;
+  padding: 0.35rem 0.85rem; cursor: pointer;
+  letter-spacing: 0.04em; white-space: nowrap; transition: background 0.18s;
+}
+.back-btn:hover { background: var(--rosso); border-color: var(--rosso); }
+.page-label {
+  font-family: 'Playfair Display', serif; font-size: 0.95rem; font-weight: 700;
+  font-style: italic; color: var(--crema); flex: 1; letter-spacing: 0.01em;
+}
+.progress-dots { display: flex; gap: 5px; align-items: center; }
+.dot { width: 11px; height: 11px; border-radius: 50%; background: var(--grigio); transition: all 0.3s; }
+.dot.visited { background: var(--oro); }
+.dot.current { background: var(--rosso); transform: scale(1.3); }
+
+#home { background: var(--nero); position: relative; overflow: hidden; }
+.home-content { position: relative; z-index: 2; padding: 2.5rem 1.5rem 3rem; display: flex; flex-direction: column; min-height: 100vh; }
+
+@keyframes slideDown { from { opacity:0; transform:translateY(-18px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideUp   { from { opacity:0; transform:translateY(18px); }  to { opacity:1; transform:translateY(0); } }
+@keyframes pulseRed  { 0%,100% { box-shadow: 0 0 0 0 rgba(214,60,30,0); } 50% { box-shadow: 0 0 18px 4px rgba(214,60,30,0.25); } }
+@keyframes rotateWheel { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes flickerLine { 0%,100% { opacity:0.25; } 50% { opacity:0.55; } }
+
+.home-title { animation: slideDown 0.55s ease both; }
+.divider { animation: slideDown 0.65s ease both; }
+.home-intro { animation: slideUp 0.6s 0.1s ease both; }
+.city-illo { animation: slideUp 0.65s 0.15s ease both; }
+.russolo-quote { animation: slideUp 0.65s 0.25s ease both; }
+.btn-cta { animation: slideUp 0.65s 0.35s ease both; }
+#home .btn-cta { animation: slideUp 0.65s 0.35s ease both, pulseRed 3s 1s ease-in-out infinite; }
+
+.svg-speed-line { animation: flickerLine 2.5s ease-in-out infinite; }
+.svg-speed-line:nth-child(2) { animation-delay: 0.4s; }
+.svg-speed-line:nth-child(3) { animation-delay: 0.9s; }
+
+.home-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  color: var(--oro); border: 1px solid rgba(201,137,10,0.4);
+  border-radius: 4px; padding: 0.28rem 0.75rem; margin-bottom: 1.4rem; width: fit-content;
+  text-transform: uppercase; background: rgba(201,137,10,0.08);
+}
+.home-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.4rem, 10vw, 4rem);
+  line-height: 1.05; color: var(--crema);
+  margin-bottom: 0.3rem; font-weight: 700;
+}
+.home-title .r { color: var(--rosso); font-style: italic; }
+.divider { width: 40px; height: 3px; background: var(--rosso); margin-bottom: 1.5rem; }
+.city-illo {
+  width: 100%; height: 165px; border-radius: var(--radius);
+  margin-bottom: 1.4rem; position: relative; overflow: hidden;
+  background: var(--nero2); border: 1px solid rgba(201,137,10,0.2);
+}
+.home-intro { font-size: 0.97rem; line-height: 1.78; color: rgba(244,237,224,0.75); margin-bottom: 1rem; }
+.russolo-quote {
+  border-left: 3px solid var(--rosso);
+  background: rgba(214,60,30,0.12);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 0.9rem 1.1rem; margin: 0.5rem 0 1.8rem;
+  font-style: italic; font-size: 0.97rem;
+  color: var(--oro-l); line-height: 1.7;
+}
+.btn-cta {
+  font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 800;
+  letter-spacing: 0.06em; background: var(--rosso); color: #fff;
+  border: none; padding: 0.9rem 2rem; cursor: pointer; border-radius: 6px;
+  transition: background 0.18s, transform 0.15s;
+  align-self: flex-start; margin-top: auto;
+  text-transform: uppercase;
+}
+.btn-cta:hover { background: var(--rosso-d); transform: translateY(-2px); }
+
+.mappa-percorso {
+  margin: 0 1.1rem 0.5rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1.5px solid var(--grigio);
+  background: var(--nero2);
+  position: relative;
+}
+.mappa-percorso svg { display: block; width: 100%; }
+.mappa-label {
+  font-size: 10px; font-weight: 800; color: var(--testo-m);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 0.5rem 1.1rem 0.2rem;
+}
+.map-pin { cursor: pointer; transition: transform 0.15s; transform-origin: center bottom; }
+.map-pin:hover { transform: scale(1.2); }
+.map-pin.visited-pin circle.pin-bg { fill: var(--oro); }
+.map-pin.visited-pin text { fill: var(--nero); }
+
+#percorso { background: var(--crema); }
+.tappe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; padding: 1rem 1.1rem 2rem; }
+.tappa-card {
+  background: #fff; border-radius: var(--radius);
+  box-shadow: 0 2px 10px rgba(20,16,12,0.09); cursor: pointer;
+  transition: transform 0.18s, box-shadow 0.18s; overflow: hidden; position: relative;
+  border: 1.5px solid var(--crema2);
+}
+.tappa-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(214,60,30,0.18); border-color: var(--rosso); }
+.tappa-card.visited-card { border-color: var(--oro); }
+.tappa-card-thumb {
+  width: 100%; height: 80px; display: flex; align-items: center;
+  justify-content: center; font-size: 2.2rem; position: relative; overflow: hidden;
+  background: var(--nero);
+}
+.tappa-card-thumb img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+.tappa-card-thumb .emoji-fallback { position: relative; z-index: 1; }
+.tappa-card-body { padding: 0.6rem 0.7rem 0.7rem; }
+.tappa-num { font-size: 10px; font-weight: 700; color: var(--rosso); letter-spacing: 0.12em; text-transform: uppercase; }
+.tappa-name { font-size: 0.82rem; font-weight: 700; color: var(--testo-sc); line-height: 1.25; margin-top: 2px; }
+.visited-badge {
+  position: absolute; top: 6px; right: 6px; width: 20px; height: 20px;
+  background: var(--oro); border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-size: 10px; color: #fff;
+}
+.percorso-header { padding: 1.2rem 1.1rem 0.3rem; }
+.percorso-intro { font-size: 0.88rem; color: var(--testo-m); line-height: 1.65; }
+.tappa-hero {
+  width: 100%; padding: 1.3rem 1.2rem 1.1rem;
+  display: flex; align-items: center; gap: 1rem;
+  background: var(--nero); border-bottom: 2px solid var(--rosso);
+}
+.tappa-hero-overlay { flex: 1; }
+.tappa-hero-overlay h2 {
+  font-family: 'Playfair Display', serif; font-size: 1.4rem;
+  color: var(--crema); letter-spacing: 0.01em; line-height: 1.2;
+}
+.tappa-hero-overlay span {
+  font-size: 10px; font-weight: 700; color: var(--rosso);
+  letter-spacing: 0.15em; text-transform: uppercase;
+}
+.tappa-hero-emoji {
+  font-size: 2.6rem; line-height: 1;
+  background: var(--nero2); border: 1px solid var(--grigio);
+  border-radius: 10px; padding: 0.5rem 0.65rem; flex-shrink: 0;
+}
+
+.tappa-body { padding: 1.2rem 1.1rem; background: var(--crema); }
+
+.toggle-row {
+  display: flex; background: var(--nero);
+  border-radius: 6px; padding: 3px; margin-bottom: 1.3rem; gap: 3px;
+}
+.toggle-btn {
+  flex: 1; padding: 0.6rem 0.5rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: none; border: none;
+  color: rgba(244,237,224,0.45); cursor: pointer; transition: all 0.2s; border-radius: 4px;
+}
+.toggle-btn.active { background: var(--rosso); color: #fff; }
+
+.mode-panel { display: none; }
+.mode-panel.active { display: block; }
+
+.testo-normale { font-size: 0.97rem; line-height: 1.82; color: var(--testo-m); }
+.testo-futurista {
+  font-size: 0.97rem; line-height: 1.82; color: var(--testo-sc);
+  font-style: italic;
+  background: #fff; border-radius: var(--radius-sm);
+  padding: 1rem 1.1rem; border-left: 4px solid var(--rosso);
+  box-shadow: 0 2px 8px rgba(20,16,12,0.07);
+}
+
+.img-frame {
+  width: 100%; height: 240px; border-radius: var(--radius);
+  margin: 1rem 0; overflow: hidden; position: relative;
+  background: var(--crema2); display: flex; align-items: center; justify-content: center;
+  border: 1.5px dashed rgba(90,78,64,0.3);
+}
+.img-frame img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius); }
+.img-placeholder { font-size: 11px; font-weight: 600; color: var(--testo-l); letter-spacing: 0.05em; text-align: center; }
+
+
+.audio-section { margin-top: 1rem; }
+.audio-label { font-size: 11px; font-weight: 700; color: var(--testo-m); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.audio-player-wrap {
+  background: var(--nero); border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem; display: flex; align-items: center; gap: 0.8rem;
+}
+.audio-play-btn {
+  width: 36px; height: 36px; border-radius: 50%; background: var(--rosso);
+  border: none; color: #fff; cursor: pointer; font-size: 13px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background 0.15s;
+}
+.audio-play-btn:hover { background: var(--rosso-d); }
+.audio-info { flex: 1; }
+.audio-name { font-size: 11px; font-weight: 600; color: rgba(244,237,224,0.5); }
+
+
+.indizio-box {
+  margin-top: 1.2rem; background: var(--nero);
+  border-left: 4px solid var(--oro);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 0.9rem 1rem;
+}
+.indizio-label { font-size: 10px; font-weight: 800; color: var(--oro); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.4rem; }
+.indizio-text { font-size: 0.92rem; color: var(--oro-l); font-style: italic; line-height: 1.65; }
+
+/* MINIGAME inline */
+.minigame-section {
+  margin-top: 1.3rem; border-radius: var(--radius);
+  background: #fff; overflow: hidden;
+  border: 1.5px solid var(--crema2);
+  box-shadow: 0 2px 8px rgba(20,16,12,0.07);
+}
+.minigame-header {
+  background: var(--nero2); padding: 0.75rem 1rem;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 2px solid var(--rosso);
+}
+.minigame-title { font-size: 0.88rem; font-weight: 800; letter-spacing: 0.05em; color: var(--crema); text-transform: uppercase; }
+.minigame-body { padding: 1rem; }
+.mini-question { font-size: 0.95rem; font-weight: 600; color: var(--testo-sc); line-height: 1.6; margin-bottom: 0.9rem; }
+.mini-options { display: flex; flex-direction: column; gap: 0.5rem; }
+.mini-opt {
+  background: var(--crema2); border: 1.5px solid transparent;
+  border-radius: var(--radius-sm); padding: 0.65rem 0.9rem; cursor: pointer;
+  font-size: 0.9rem; font-weight: 600; color: var(--testo-sc);
+  text-align: left; width: 100%; transition: all 0.16s;
+}
+.mini-opt:hover:not(:disabled) { border-color: var(--rosso); background: #fff; color: var(--rosso); }
+.mini-opt.correct { border-color: var(--verde); background: var(--verde-l); color: var(--verde); }
+.mini-opt.wrong { border-color: var(--rosso); background: #fde8e4; color: var(--rosso); }
+.mini-feedback { margin-top: 0.75rem; font-size: 0.88rem; font-weight: 600; font-style: italic; min-height: 1.2rem; }
+.mini-feedback.ok { color: var(--verde); }
+.mini-feedback.ko { color: var(--rosso); }
+.mini-spiegazione {
+  display: none; margin-top: 0.6rem;
+  background: linear-gradient(135deg, rgba(42,122,74,0.12), rgba(42,122,74,0.05));
+  border: 1px solid rgba(42,122,74,0.3);
+  border-radius: var(--radius-sm); padding: 0.7rem 0.9rem;
+  font-size: 0.86rem; line-height: 1.65; color: var(--testo-sc);
+  animation: fadeIn 0.3s ease;
+}
+.mini-spiegazione.show { display: block; }
+.mini-spiegazione-icon { font-size: 1rem; margin-right: 0.3rem; }
+.mini-indizio-reveal {
+  margin-top: 0.9rem; padding: 0.75rem 1rem;
+  background: var(--nero); border-radius: var(--radius-sm); display: none;
+  border-left: 3px solid var(--oro);
+}
+.mini-indizio-reveal.show { display: block; }
+.mir-label { font-size: 10px; font-weight: 800; color: var(--oro); letter-spacing: 0.15em; text-transform: uppercase; }
+.mir-word {
+  font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--crema);
+  letter-spacing: 0.18em; margin-top: 2px; font-style: italic;
+}
+
+.nav-tappe { display: flex; justify-content: space-between; align-items: center; margin-top: 1.8rem; padding-top: 1.2rem; border-top: 1.5px solid var(--crema2); }
+.nav-btn {
+  font-family: 'Nunito', sans-serif; font-size: 0.88rem; font-weight: 700;
+  background: var(--nero); border: none; color: var(--crema);
+  padding: 0.5rem 1.1rem; cursor: pointer; border-radius: 6px;
+  letter-spacing: 0.04em; text-transform: uppercase; transition: all 0.16s;
+}
+.nav-btn:hover:not(:disabled) { background: var(--rosso); }
+.nav-btn:disabled { opacity: 0.25; cursor: default; }
+.nav-counter { font-size: 11px; font-weight: 700; color: var(--testo-l); }
+
+#quiz { background: var(--crema); }
+.quiz-content { padding: 1.2rem 1.1rem; flex: 1; }
+.quiz-intro-text { font-size: 0.9rem; color: var(--testo-m); line-height: 1.7; margin-bottom: 1.6rem; }
+
+/* GIOCO RIORDINO FRASE */
+.ordine-section {
+  margin-top: 1.5rem; border-radius: var(--radius);
+  background: #fff; overflow: hidden;
+  border: 1.5px solid var(--crema2);
+  box-shadow: 0 2px 8px rgba(20,16,12,0.07);
+}
+.ordine-header {
+  background: var(--nero2); padding: 0.75rem 1rem;
+  border-bottom: 2px solid var(--rosso);
+}
+.ordine-header-title {
+  font-size: 0.88rem; font-weight: 800;
+  letter-spacing: 0.05em; color: var(--crema); text-transform: uppercase;
+}
+.ordine-body { padding: 1rem; }
+.ordine-hint {
+  font-size: 0.88rem; color: var(--testo-m);
+  line-height: 1.6; margin-bottom: 1rem;
+}
+.ordine-slot-wrap {
+  background: var(--crema2); border-radius: var(--radius-sm);
+  padding: 0.75rem; margin-bottom: 0.9rem; min-height: 54px;
+}
+.ordine-slots {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  align-items: center; min-height: 36px;
+}
+.ordine-slot-placeholder {
+  font-size: 0.85rem; color: var(--testo-l); font-style: italic;
+}
+.ordine-pool {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin-bottom: 1rem; min-height: 40px;
+}
+.ordine-chip {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.92rem; font-style: italic;
+  letter-spacing: 0.04em; padding: 0.4rem 0.8rem;
+  border-radius: 6px; cursor: pointer;
+  transition: all 0.15s; border: 1.5px solid transparent;
+}
+.ordine-chip.available {
+  background: var(--nero); color: var(--crema); border-color: var(--grigio);
+}
+.ordine-chip.available:hover:not(:disabled) {
+  border-color: var(--oro); color: var(--oro);
+}
+.ordine-chip.placed {
+  background: rgba(201,137,10,0.15); color: var(--testo-sc);
+  border-color: var(--oro);
+}
+.ordine-chip.placed:hover:not(:disabled) {
+  background: rgba(214,60,30,0.08); border-color: var(--rosso); color: var(--rosso);
+}
+.ordine-chip.correct {
+  background: var(--verde-l); color: var(--verde); border-color: var(--verde);
+}
+.ordine-chip.wrong {
+  background: #fde8e4; color: var(--rosso); border-color: var(--rosso);
+}
+.ordine-chip:disabled { cursor: default; }
+.ordine-actions {
+  display: flex; gap: 0.6rem; margin-bottom: 0.6rem;
+}
+.ordine-reset-btn {
+  font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700;
+  background: transparent; color: var(--testo-m);
+  border: 1.5px solid var(--crema2); border-radius: 6px;
+  padding: 0.5rem 0.9rem; cursor: pointer; transition: all 0.15s;
+}
+.ordine-reset-btn:hover { border-color: var(--rosso); color: var(--rosso); }
+.ordine-submit-btn {
+  font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 800;
+  background: var(--rosso); color: #fff; border: none;
+  border-radius: 6px; padding: 0.5rem 1.2rem; cursor: pointer;
+  transition: background 0.15s; flex: 1;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.ordine-submit-btn:hover:not(:disabled) { background: var(--rosso-d); }
+.ordine-submit-btn:disabled { opacity: 0.4; cursor: default; }
+.ordine-feedback { margin-top: 0.6rem; }
+.ordine-fb-ok {
+  font-size: 0.95rem; font-weight: 700; color: var(--verde); padding: 0.5rem 0;
+}
+.ordine-fb-ko {
+  font-size: 0.95rem; font-weight: 700; color: var(--rosso); padding: 0.5rem 0;
+}
+
+/* PAROLA MISTERO */
+.parola-section {
+  margin-top: 2rem; border-radius: var(--radius);
+  background: var(--nero); overflow: hidden; border: 1.5px solid var(--grigio);
+}
+.parola-header { background: var(--nero2); padding: 0.85rem 1rem; border-bottom: 2px solid var(--oro); }
+.parola-header-title { font-size: 0.88rem; font-weight: 800; color: var(--oro); letter-spacing: 0.08em; text-transform: uppercase; }
+.parola-body { padding: 1rem; }
+.parola-pieces { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+.ppiece {
+  font-family: 'Playfair Display', serif; font-size: 1rem; font-style: italic;
+  letter-spacing: 0.1em; padding: 0.35rem 0.65rem;
+  border: 1px solid var(--grigio); border-radius: 4px;
+  background: var(--nero2); color: var(--grigio); transition: all 0.4s;
+}
+.ppiece.found { color: var(--oro); border-color: var(--oro); background: rgba(201,137,10,0.12); }
+.parola-hint { font-size: 0.85rem; color: rgba(244,237,224,0.5); margin-bottom: 0.8rem; line-height: 1.55; }
+
+#finale { background: var(--nero); }
+.finale-content { padding: 2.5rem 1.5rem; text-align: center; flex: 1; }
+.finale-ornament { font-size: 3rem; margin-bottom: 0.5rem; color: var(--oro); }
+.finale-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.5rem, 6vw, 2.3rem); color: var(--crema);
+  line-height: 1.2; margin: 1rem 0 1.2rem; font-style: italic;
+}
+.finale-title em { color: var(--rosso); font-style: normal; }
+.finale-body { font-size: 0.97rem; color: rgba(244,237,224,0.65); line-height: 1.8; margin-bottom: 2rem; }
+.credits {
+  background: var(--nero2); border: 1px solid var(--grigio);
+  border-radius: var(--radius); padding: 1.3rem; text-align: left;
+}
+.credits-title { font-size: 0.88rem; font-weight: 800; color: var(--oro); letter-spacing: 0.08em; margin-bottom: 0.9rem; text-transform: uppercase; }
+.cr { display: flex; justify-content: space-between; border-bottom: 1px solid var(--grigio); padding: 0.5rem 0; font-size: 0.84rem; }
+.cr span:first-child { color: rgba(244,237,224,0.4); font-weight: 600; }
+.cr span:last-child { color: var(--crema); font-weight: 700; text-align: right; }
+.cr:last-child { border: none; }
+
+.nav-menu-btn {
+  position: absolute; top: 1.4rem; right: 1.5rem; z-index: 50;
+  width: 38px; height: 38px; border-radius: 8px;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+  cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 5px;
+  transition: background 0.18s;
+}
+.nav-menu-btn:hover { background: var(--rosso); border-color: var(--rosso); }
+.nav-menu-btn span {
+  display: block; width: 18px; height: 2px;
+  background: var(--crema); border-radius: 2px; transition: all 0.2s;
+}
+.nav-drawer { position: fixed; inset: 0; z-index: 200; display: none; }
+.nav-drawer.open { display: block; }
+.nav-overlay {
+  position: absolute; inset: 0; background: rgba(20,16,12,0.6);
+}
+.nav-panel {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 75%; max-width: 300px;
+  background: var(--nero); border-left: 2px solid var(--rosso);
+  display: flex; flex-direction: column;
+  animation: slideIn 0.25s ease;
+}
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.nav-panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.1rem 1.2rem; border-bottom: 1px solid var(--grigio);
+}
+.nav-panel-title { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--crema); font-style: italic; }
+.nav-close-btn {
+  width: 30px; height: 30px; border-radius: 6px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  color: var(--crema); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.nav-close-btn:hover { background: var(--rosso); border-color: var(--rosso); }
+.nav-items { flex: 1; overflow-y: auto; padding: 0.6rem 0; }
+.nav-section-label {
+  font-size: 10px; font-weight: 800; color: var(--oro);
+  letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 0.8rem 1.2rem 0.3rem;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.7rem 1.2rem; cursor: pointer;
+  transition: background 0.15s; border: none; background: none;
+  width: 100%; text-align: left;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); }
+.nav-item.active-nav { background: rgba(214,60,30,0.15); }
+.nav-item-icon {
+  width: 32px; height: 32px; border-radius: 7px;
+  background: var(--nero2); border: 1px solid var(--grigio);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.nav-item.active-nav .nav-item-icon { background: var(--rosso); border-color: var(--rosso); }
+.nav-item-label { font-size: 0.88rem; font-weight: 700; color: var(--crema); line-height: 1.3; }
+.nav-item-sub { font-size: 10px; color: rgba(244,237,224,0.4); font-weight: 600; margin-top: 1px; }
+.nav-divider { height: 1px; background: var(--grigio); margin: 0.4rem 1.2rem; }
+
+.maps-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 700;
+  background: var(--nero); color: var(--crema);
+  border: 1px solid var(--grigio); border-radius: 6px;
+  padding: 0.55rem 1rem; cursor: pointer; text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+  margin-top: 1rem; width: 100%; justify-content: center;
+  letter-spacing: 0.03em;
+}
+.maps-btn:hover { background: #1a4a8a; border-color: #4a7fd4; }
+.maps-btn svg { flex-shrink: 0; }
+
+.btn-guida-wrap {
+  margin-top: 0.75rem; align-self: flex-start;
+}
+.btn-guida-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--oro); margin-bottom: 0.4rem;
+  display: flex; align-items: center; gap: 5px;
+}
+.btn-guida-label::before { content: '↓'; font-size: 11px; }
+.btn-guida {
+  font-family: 'Nunito', sans-serif; font-size: 0.92rem; font-weight: 800;
+  letter-spacing: 0.05em; background: rgba(201,137,10,0.12); color: var(--oro);
+  border: 1.5px solid var(--oro); padding: 0.75rem 1.5rem;
+  cursor: pointer; border-radius: 6px;
+  align-self: flex-start; transition: all 0.18s; text-transform: uppercase;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.btn-guida:hover { background: var(--oro); color: var(--nero); }
+
+#guida { background: var(--crema); overflow-y: auto; }
+.guida-content { padding: 1.2rem 1.1rem 4rem; flex: 1; }
+.guida-intro {
+  font-size: 0.95rem; color: var(--testo-m); line-height: 1.75;
+  margin-bottom: 1.5rem; padding: 1rem 1.1rem;
+  background: var(--nero); border-left: 3px solid var(--rosso);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: rgba(244,237,224,0.8);
+}
+.guida-intro strong { color: var(--crema); }
+.guida-step {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1rem; margin-bottom: 0.75rem;
+  background: #fff; border-radius: var(--radius);
+  border: 1.5px solid var(--crema2);
+  box-shadow: 0 1px 6px rgba(20,16,12,0.06);
+}
+.guida-step-icon {
+  font-size: 1.6rem; width: 44px; height: 44px; flex-shrink: 0;
+  background: var(--nero); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.guida-step-body { flex: 1; }
+.guida-step-title {
+  font-size: 0.92rem; font-weight: 800; color: var(--testo-sc);
+  margin-bottom: 0.3rem; letter-spacing: 0.01em;
+}
+.guida-step-text {
+  font-size: 0.88rem; color: var(--testo-m); line-height: 1.65;
+}
+.guida-step-text strong { color: var(--rosso); font-weight: 700; }
+
+.guida-cta-btn {
+  display: flex; align-items: center; gap: 1rem;
+  width: 100%; margin: 1.5rem 0 0.8rem;
+  background: var(--nero); border: 2px solid var(--rosso);
+  border-radius: var(--radius); padding: 1.1rem 1.2rem;
+  cursor: pointer; text-align: left; transition: background 0.18s, transform 0.15s;
+}
+.guida-cta-btn:hover { background: var(--rosso); transform: translateY(-2px); }
+.guida-cta-icon {
+  font-size: 2rem; width: 48px; height: 48px; flex-shrink: 0;
+  background: rgba(214,60,30,0.15); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.guida-cta-btn:hover .guida-cta-icon { background: rgba(255,255,255,0.15); }
+.guida-cta-title {
+  font-family: 'Playfair Display', serif; font-size: 1.1rem;
+  font-weight: 700; font-style: italic; color: var(--crema); line-height: 1.2;
+}
+.guida-cta-sub {
+  font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--rosso); margin-top: 3px;
+}
+.guida-cta-btn:hover .guida-cta-sub { color: rgba(255,255,255,0.8); }
+
+.top-bar .nav-menu-btn {
+  position: static; width: 32px; height: 32px; border-radius: 6px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18);
+  cursor: pointer; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+  transition: background 0.18s; flex-shrink: 0;
+}
+.top-bar .nav-menu-btn:hover { background: var(--rosso); border-color: var(--rosso); }
+.top-bar .nav-menu-btn span { display: block; width: 14px; height: 1.5px; background: var(--crema); border-radius: 2px; }
+
+input[type=file] { display: none; }
+
+/* ═══════════════════════════════════
+   RIEPILOGO / CERTIFICATO
+═══════════════════════════════════ */
+#riepilogo { background: var(--nero); overflow-y: auto; }
+.riepilogo-content { padding: 0.8rem 1.2rem 2rem; flex: 1; display: flex; flex-direction: column; align-items: center; }
+.riepilogo-star {
+  font-size: 2.2rem; margin-bottom: 0.2rem;
+  animation: slideDown 0.5s ease both;
+}
+.riepilogo-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 6vw, 2rem);
+  color: var(--crema); text-align: center; line-height: 1.15;
+  font-weight: 700; font-style: italic; margin-bottom: 1rem;
+  animation: slideDown 0.6s 0.1s ease both;
+}
+/* Il certificato vero e proprio */
+.cert-card {
+  width: 100%; max-width: 380px;
+  background: var(--nero2);
+  border: 2px solid var(--oro);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(201,137,10,0.2);
+  animation: slideUp 0.65s 0.2s ease both;
+  margin-bottom: 0.9rem;
+}
+.cert-header {
+  background: linear-gradient(135deg, #1e1812, #2a1e14);
+  border-bottom: 2px solid var(--oro);
+  padding: 0.8rem 1.4rem;
+  text-align: center; position: relative; overflow: hidden;
+}
+.cert-header::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at top, rgba(201,137,10,0.15), transparent 70%);
+  pointer-events: none;
+}
+.cert-ornament-line {
+  display: flex; align-items: center; gap: 0.5rem;
+  justify-content: center; margin-bottom: 0.6rem;
+}
+.cert-ornament-line::before, .cert-ornament-line::after {
+  content: ''; flex: 1; height: 1px; background: rgba(201,137,10,0.5);
+}
+.cert-ornament-text { font-size: 9px; font-weight: 800; letter-spacing: 0.2em; color: var(--oro); text-transform: uppercase; }
+.cert-header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem; font-weight: 700; font-style: italic;
+  color: var(--crema); line-height: 1.2; margin-bottom: 0.2rem;
+}
+.cert-header-sub {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.15em;
+  text-transform: uppercase; color: rgba(244,237,224,0.4);
+}
+.cert-body { padding: 0.9rem 1.4rem; }
+.cert-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--oro); margin-bottom: 0.7rem;
+  text-align: center;
+}
+.cert-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.7rem; margin-bottom: 0.8rem; }
+.cert-stat {
+  background: var(--nero); border: 1px solid var(--grigio);
+  border-radius: var(--radius-sm); padding: 0.6rem 0.4rem;
+  text-align: center;
+}
+.cert-stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem; font-weight: 700; color: var(--oro);
+  line-height: 1; margin-bottom: 0.2rem;
+}
+.cert-stat-num-mystery { color: var(--rosso); }
+.cert-stat-label { font-size: 9px; font-weight: 700; color: rgba(244,237,224,0.4); letter-spacing: 0.08em; text-transform: uppercase; }
+.cert-divider { height: 1px; background: var(--grigio); margin: 0.6rem 0; }
+.cert-footer {
+  background: rgba(201,137,10,0.08);
+  border-top: 1px solid rgba(201,137,10,0.2);
+  padding: 0.75rem 1.4rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.cert-footer-left { font-size: 9px; font-weight: 700; color: rgba(244,237,224,0.3); letter-spacing: 0.1em; text-transform: uppercase; }
+.cert-footer-right { font-size: 9px; font-weight: 800; color: var(--oro); letter-spacing: 0.08em; }
+
+.cert-dl-btn {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  width: 100%; max-width: 380px;
+  font-family: 'Nunito', sans-serif; font-size: 0.92rem; font-weight: 800;
+  letter-spacing: 0.05em; background: var(--oro); color: var(--nero);
+  border: none; padding: 0.85rem 1.5rem; cursor: pointer; border-radius: 6px;
+  transition: background 0.18s, transform 0.15s; text-transform: uppercase;
+  animation: slideUp 0.65s 0.35s ease both;
+  margin-bottom: 0.5rem;
+}
+.cert-dl-btn:hover { background: #e8a010; transform: translateY(-2px); }
+.cert-dl-btn:active { transform: translateY(0); }
+
+.cert-finale-btn {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  width: 100%; max-width: 380px;
+  font-family: 'Nunito', sans-serif; font-size: 0.92rem; font-weight: 800;
+  letter-spacing: 0.05em; background: var(--rosso); color: #fff;
+  border: none; padding: 0.85rem 1.5rem; cursor: pointer; border-radius: 6px;
+  transition: background 0.18s, transform 0.15s; text-transform: uppercase;
+  animation: slideUp 0.65s 0.4s ease both;
+}
+.cert-finale-btn:hover { background: var(--rosso-d); transform: translateY(-2px); }
+
+/* canvas nascosto per la generazione dell'immagine */
+#cert-canvas { display: none; }
+
+/* ═══════════════════════════════════
+   MODALITÀ DESKTOP
+═══════════════════════════════════ */
+body.desktop #app           { max-width: 900px; }
+body.desktop .home-content  { padding: 3rem 2.5rem 4rem; }
+body.desktop .home-title    { font-size: clamp(3rem, 7vw, 5rem); }
+body.desktop .home-intro    { font-size: 1.05rem; max-width: 560px; }
+body.desktop .russolo-quote { max-width: 560px; font-size: 1.02rem; }
+body.desktop .city-illo     { height: 220px; }
+body.desktop .mappa-percorso { margin: 0 2rem 0.6rem; }
+body.desktop .mappa-label   { padding: 0.6rem 2rem 0.25rem; }
+body.desktop .percorso-header { padding: 1.4rem 2rem 0.4rem; }
+body.desktop .tappe-grid    { grid-template-columns: repeat(4, 1fr); padding: 1rem 2rem 2.5rem; }
+body.desktop .tappa-card-thumb { height: 100px; }
+body.desktop .tappa-hero    { padding: 1.6rem 2rem 1.3rem; }
+body.desktop .tappa-body    { padding: 1.5rem 2rem; }
+body.desktop .tappa-hero-overlay h2 { font-size: 1.7rem; }
+body.desktop .top-bar       { padding: 0.9rem 2rem; }
+body.desktop .quiz-content  { padding: 1.4rem 2rem; }
+body.desktop .guida-content { padding: 1.4rem 2rem 4rem; }
+body.desktop .credits-page-content { padding: 1.8rem 2.5rem 3rem; }
+body.desktop .riepilogo-content { padding: 1rem 2rem 2.5rem; }
+body.desktop .finale-content { padding: 3rem 2.5rem; }
+
+/* Toggle view-mode nel drawer */
+.view-mode-toggle {
+  display: flex; align-items: center;
+  margin: 0.5rem 1.2rem; gap: 0;
+  background: var(--nero2); border-radius: 7px;
+  border: 1px solid var(--grigio); overflow: hidden;
+}
+.vmt-btn {
+  flex: 1; padding: 0.55rem 0.5rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.78rem; font-weight: 800;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  background: none; border: none; cursor: pointer;
+  color: rgba(244,237,224,0.35); transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.vmt-btn.vmt-active {
+  background: var(--rosso); color: #fff;
+}
+.vmt-btn:not(.vmt-active):hover { color: rgba(244,237,224,0.7); }
+
+@keyframes vibeFlash {
+  0%,100% { filter: brightness(1); }
+  25%      { filter: brightness(1.18); }
+  75%      { filter: brightness(0.92); }
+}
+body.vibe-flash { animation: vibeFlash 0.35s ease; }
+
+/* ═══════════════════════════════════
+   SPLASH SCREEN
+═══════════════════════════════════ */
+#splash {
+  position: fixed; inset: 0; z-index: 999;
+  background: var(--nero);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0;
+  pointer-events: all;
+  transition: opacity 0.8s ease;
+}
+#splash.fade-out { opacity: 0; pointer-events: none; }
+
+.splash-tag {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.18em;
+  color: var(--oro); text-transform: uppercase;
+  border: 1px solid rgba(201,137,10,0.35);
+  border-radius: 4px; padding: 0.28rem 0.85rem;
+  background: rgba(201,137,10,0.08);
+  margin-bottom: 1.8rem;
+  animation: splashFadeUp 0.7s 0.2s ease both;
+}
+.splash-logo {
+  animation: splashFadeUp 0.7s 0.05s ease both;
+  margin-bottom: 0.2rem;
+}
+.splash-logo svg { display: block; }
+.splash-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.6rem, 11vw, 4.4rem);
+  font-weight: 700; color: var(--crema);
+  line-height: 1.0; text-align: center;
+  animation: splashFadeUp 0.75s 0.15s ease both;
+  margin-bottom: 0.15rem;
+}
+.splash-title .r { color: var(--rosso); font-style: italic; }
+.splash-sub {
+  font-size: 0.82rem; font-weight: 700; letter-spacing: 0.18em;
+  color: rgba(244,237,224,0.35); text-transform: uppercase;
+  text-align: center;
+  animation: splashFadeUp 0.75s 0.3s ease both;
+  margin-bottom: 2.8rem;
+}
+.splash-bar-wrap {
+  width: 160px; height: 3px; background: rgba(255,255,255,0.08);
+  border-radius: 3px; overflow: hidden;
+  animation: splashFadeUp 0.7s 0.45s ease both;
+}
+.splash-bar {
+  height: 100%; width: 0%; background: var(--rosso);
+  border-radius: 3px;
+  animation: splashProgress 4.5s 0.5s linear both;
+}
+.splash-byline {
+  position: absolute; bottom: 2rem;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+  color: rgba(244,237,224,0.2); text-transform: uppercase;
+  animation: splashFadeUp 0.7s 0.6s ease both;
+}
+.splash-lines {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+
+@keyframes splashFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes splashProgress {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+@keyframes splashLineFade {
+  0%,100% { opacity: 0.08; }
+  50%      { opacity: 0.22; }
+}
+
+/* ═══════════════════════════════════
+   CREDITS PAGE
+═══════════════════════════════════ */
+#credits { background: var(--nero); }
+.credits-page-content {
+  padding: 1.5rem 1.3rem 3rem;
+  flex: 1;
+}
+.credits-hero {
+  text-align: center;
+  padding: 1.5rem 0 2rem;
+}
+.credits-hero-ornament {
+  font-size: 2.4rem; margin-bottom: 0.6rem;
+  color: var(--oro); opacity: 0.85;
+}
+.credits-hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.7rem; font-weight: 700; font-style: italic;
+  color: var(--crema); line-height: 1.1;
+  margin-bottom: 0.4rem;
+}
+.credits-hero-sub {
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.14em;
+  color: rgba(244,237,224,0.35); text-transform: uppercase;
+}
+.credits-divider {
+  width: 36px; height: 2px; background: var(--rosso);
+  margin: 0 auto 2rem;
+}
+.credits-block {
+  background: var(--nero2); border: 1px solid var(--grigio);
+  border-radius: var(--radius); overflow: hidden;
+  margin-bottom: 1rem;
+}
+.credits-block-title {
+  background: rgba(201,137,10,0.1);
+  border-bottom: 1px solid rgba(201,137,10,0.25);
+  padding: 0.65rem 1rem;
+  font-size: 9px; font-weight: 800; letter-spacing: 0.18em;
+  color: var(--oro); text-transform: uppercase;
+}
+.credits-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(58,48,40,0.6);
+  font-size: 0.85rem;
+}
+.credits-row:last-child { border-bottom: none; }
+.credits-row-label { color: rgba(244,237,224,0.38); font-weight: 600; }
+.credits-row-value { color: var(--crema); font-weight: 700; text-align: right; }
+.credits-quote-box {
+  margin-top: 1.5rem;
+  border-left: 3px solid var(--rosso);
+  background: rgba(214,60,30,0.1);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 1rem 1.2rem;
+  font-style: italic; font-size: 0.92rem;
+  color: var(--oro-l); line-height: 1.75;
+}
+.credits-quote-author {
+  display: block; margin-top: 0.5rem;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(244,237,224,0.35);
+  font-style: normal;
+}
+/* ═══════════════════════════════════
+   LAZY LOADING SKELETON
+═══════════════════════════════════ */
+.img-skeleton {
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, var(--nero2) 25%, var(--grigio) 50%, var(--nero2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: var(--radius);
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+.img-error {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 0.4rem; height: 100%;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  color: var(--testo-l); text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════
+   GEOLOCALIZZAZIONE
+═══════════════════════════════════ */
+.geo-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.06em;
+  border-radius: 20px; padding: 0.3rem 0.8rem;
+  margin: 0.6rem 1.1rem 0; width: fit-content;
+  text-transform: uppercase; transition: all 0.3s;
+}
+.geo-badge.near {
+  background: rgba(42,122,74,0.18); color: var(--verde);
+  border: 1px solid rgba(42,122,74,0.4);
+}
+.geo-badge.warning {
+  background: rgba(201,137,10,0.15); color: #c9890a;
+  border: 1px solid rgba(201,137,10,0.5);
+}
+.geo-badge.far {
+  background: rgba(58,48,40,0.5); color: var(--testo-l);
+  border: 1px solid var(--grigio);
+}
+.geo-badge.loading {
+  background: rgba(201,137,10,0.1); color: var(--oro);
+  border: 1px solid rgba(201,137,10,0.3);
+}
+.geo-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: currentColor; flex-shrink: 0;
+}
+.geo-badge.near .geo-dot {
+  animation: geoPulse 1.4s ease-in-out infinite;
+}
+@keyframes geoPulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.6); }
+}
+
+/* ═══════════════════════════════════
+   CELEBRATION OVERLAY
+═══════════════════════════════════ */
+#celebration {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(20,16,12,0.92);
+  display: none; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 2rem;
+}
+#celebration.show { display: flex; }
+.cel-ornament { font-size: 3.5rem; margin-bottom: 0.8rem; animation: celBounce 0.6s ease; }
+.cel-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 8vw, 2.6rem); font-weight: 700;
+  color: var(--crema); line-height: 1.1; margin-bottom: 0.5rem;
+  animation: celFadeUp 0.5s 0.15s ease both;
+}
+.cel-title span { color: var(--rosso); font-style: italic; }
+.cel-sub {
+  font-size: 0.92rem; color: rgba(244,237,224,0.6);
+  line-height: 1.7; margin-bottom: 2rem;
+  animation: celFadeUp 0.5s 0.3s ease both;
+}
+.cel-btn {
+  font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 800;
+  background: var(--rosso); color: #fff; border: none;
+  padding: 0.85rem 2rem; border-radius: 6px; cursor: pointer;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  animation: celFadeUp 0.5s 0.45s ease both;
+  transition: background 0.18s;
+}
+.cel-btn:hover { background: var(--rosso-d); }
+.cel-sparks {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+@keyframes celBounce {
+  0%   { transform: scale(0.4) rotate(-15deg); opacity: 0; }
+  70%  { transform: scale(1.15) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes celFadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes sparkFly {
+  0%   { transform: translate(0,0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+
+/* ═══════════════════════════════════
+   RESET PROGRESS BUTTON
+═══════════════════════════════════ */
+.reset-btn {
+  display: block; width: 100%; margin-top: 1.5rem;
+  font-family: 'Nunito', sans-serif; font-size: 0.82rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: transparent; color: rgba(244,237,224,0.25);
+  border: 1px solid rgba(244,237,224,0.12); border-radius: 6px;
+  padding: 0.6rem; cursor: pointer; transition: all 0.18s;
+}
+.reset-btn:hover { color: var(--rosso); border-color: var(--rosso); background: rgba(214,60,30,0.08); }
+#guida .reset-btn { color: var(--testo-m); border-color: rgba(90,78,64,0.3); }
+#guida .reset-btn:hover { color: var(--rosso); border-color: var(--rosso); background: rgba(214,60,30,0.06); }
+/* ═══════════════════════════════════
+   QUIZ BLOCCATO — AVVISO
+═══════════════════════════════════ */
+#quiz-locked-toast {
+  position: fixed; inset: 0; z-index: 600;
+  display: none; align-items: flex-end; justify-content: center;
+  padding-bottom: 2rem;
+  pointer-events: none;
+}
+#quiz-locked-toast.show {
+  display: flex;
+  pointer-events: all;
+}
+.qlt-overlay {
+  position: absolute; inset: 0;
+  background: rgba(20,16,12,0.55);
+  animation: qltFadeIn 0.22s ease;
+}
+.qlt-box {
+  position: relative; z-index: 1;
+  background: var(--nero2);
+  border: 1.5px solid var(--rosso);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.4rem 1.3rem;
+  max-width: 360px; width: calc(100% - 2.4rem);
+  box-shadow: 0 8px 32px rgba(214,60,30,0.25);
+  animation: qltSlideUp 0.28s ease;
+}
+.qlt-icon {
+  font-size: 2.2rem; text-align: center;
+  margin-bottom: 0.6rem;
+}
+.qlt-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; font-weight: 700; font-style: italic;
+  color: var(--crema); text-align: center;
+  line-height: 1.2; margin-bottom: 0.5rem;
+}
+.qlt-title span { color: var(--rosso); }
+.qlt-body {
+  font-size: 0.88rem; color: rgba(244,237,224,0.65);
+  line-height: 1.7; text-align: center; margin-bottom: 1rem;
+}
+.qlt-progress {
+  display: flex; gap: 5px; justify-content: center;
+  margin-bottom: 1.1rem;
+}
+.qlt-pip {
+  width: 24px; height: 6px; border-radius: 3px;
+  background: var(--grigio); transition: background 0.3s;
+}
+.qlt-pip.done { background: var(--oro); }
+.qlt-pip.missing { background: var(--rosso); opacity: 0.5; }
+.qlt-close {
+  display: block; width: 100%;
+  font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 800;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  background: var(--rosso); color: #fff;
+  border: none; border-radius: 6px; padding: 0.75rem;
+  cursor: pointer; transition: background 0.18s;
+}
+.qlt-close:hover { background: var(--rosso-d); }
+
+.quiz-locked-msg {
+  background: var(--nero2); border: 1.5px solid var(--grigio);
+  border-radius: var(--radius-sm); padding: 0.9rem 1rem;
+  text-align: center;
+}
+.quiz-locked-msg-icon { font-size: 1.6rem; margin-bottom: 0.35rem; }
+.quiz-locked-msg-text {
+  font-size: 0.88rem; font-weight: 700;
+  color: rgba(244,237,224,0.55); line-height: 1.55;
+}
+.quiz-locked-msg-text strong { color: var(--oro); }
+
+.nav-item-locked { opacity: 0.6; cursor: default; }
+.nav-item-locked:hover { background: transparent !important; }
+
+@keyframes qltFadeIn  { from { opacity:0; } to { opacity:1; } }
+@keyframes qltSlideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+/* ═══ STELLE PUNTEGGIO ═══ */
+.mini-stars {
+  display: flex; gap: 3px; margin-top: 0.6rem; align-items: center;
+}
+.mini-stars-label {
+  font-size: 10px; font-weight: 800; color: var(--testo-l);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-right: 4px;
+}
+.star {
+  font-size: 1.1rem; line-height: 1; transition: transform 0.2s;
+  filter: grayscale(1) opacity(0.3);
+}
+.star.lit {
+  filter: none;
+  animation: starPop 0.3s ease both;
+}
+@keyframes starPop {
+  0%   { transform: scale(0.5); }
+  60%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+/* stelle sulle card percorso */
+.card-stars {
+  display: flex; gap: 2px; margin-top: 3px;
+}
+.card-star { font-size: 0.7rem; filter: grayscale(1) opacity(0.3); }
+.card-star.lit { filter: none; }
+/* stelle nel certificato */
+.cert-stars-row {
+  display: flex; flex-direction: column; gap: 4px;
+  margin: 0.5rem 0 0.6rem;
+}
+.cert-star-tappa {
+  display: flex; align-items: center; gap: 6px;
+}
+.cert-star-tappa-name {
+  font-size: 9px; font-weight: 700; color: rgba(244,237,224,0.4);
+  letter-spacing: 0.05em; width: 90px; flex-shrink: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cert-star-tappa-stars { display: flex; gap: 2px; }
+.cert-star { font-size: 0.75rem; filter: grayscale(1) opacity(0.25); }
+.cert-star.lit { filter: none; }
+.cert-total-stars {
+  text-align: center; margin: 0.4rem 0 0;
+  font-size: 11px; font-weight: 700;
+  color: var(--oro); letter-spacing: 0.06em;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════ QUIZ LOCKED TOAST ══════════ -->
+<div id="quiz-locked-toast">
+  <div class="qlt-overlay" onclick="closeQuizLocked()"></div>
+  <div class="qlt-box">
+    <div class="qlt-icon">🔒</div>
+    <div class="qlt-title">Il mistero è ancora <span>irrisolto</span></div>
+    <p class="qlt-body">«Non puoi risolvere il caso senza aver raccolto tutti gli indizi. Russolo ti osserva — torna sui tuoi passi e visita ogni tappa.»</p>
+    <div class="qlt-progress" id="qlt-progress"></div>
+    <button class="qlt-close" onclick="closeQuizLocked()">TORNA AL PERCORSO →</button>
+  </div>
+</div>
+
+<!-- ══════════ CELEBRATION OVERLAY ══════════ -->
+<div id="celebration">
+  <div class="cel-sparks" id="cel-sparks"></div>
+  <div class="cel-ornament">🎉</div>
+  <div class="cel-title">Percorso<br><span>completato!</span></div>
+  <p class="cel-sub" id="cel-sub-text">Hai visitato tutte e 7 le tappe.<br>Ora puoi risolvere il mistero del quadro scomparso.</p>
+  <button class="cel-btn" onclick="closeCelebration()">VAI AL QUIZ →</button>
+</div>
+
+<!-- ══════════ SPLASH SCREEN ══════════ -->
+<div id="splash">
+  <!-- linee di velocità futuriste -->
+  <div class="splash-lines">
+    <svg width="100%" height="100%" viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="200" x2="400" y2="185" stroke="#d63c1e" stroke-width="0.5" style="animation:splashLineFade 2.8s 0.3s ease-in-out infinite"/>
+      <line x1="0" y1="240" x2="400" y2="222" stroke="#c9890a" stroke-width="0.35" style="animation:splashLineFade 2.8s 0.7s ease-in-out infinite"/>
+      <line x1="0" y1="290" x2="400" y2="275" stroke="#d63c1e" stroke-width="0.3" style="animation:splashLineFade 3.2s 1.1s ease-in-out infinite"/>
+      <line x1="0" y1="540" x2="400" y2="528" stroke="#d63c1e" stroke-width="0.5" style="animation:splashLineFade 2.6s 0.5s ease-in-out infinite"/>
+      <line x1="0" y1="580" x2="400" y2="565" stroke="#c9890a" stroke-width="0.3" style="animation:splashLineFade 3s 0.9s ease-in-out infinite"/>
+    </svg>
+  </div>
+
+  <div class="splash-tag">⚡ Portogruaro · 2026</div>
+
+  <!-- logo / icona -->
+  <div class="splash-logo">
+    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="64" rx="14" fill="#1e1812"/>
+      <rect x="0" y="58" width="64" height="3" rx="1" fill="#d63c1e"/>
+      <!-- campanile stilizzato -->
+      <rect x="28" y="8" width="8" height="36" fill="#3a2a1a"/>
+      <rect x="24" y="6" width="16" height="5" fill="#2a1e14"/>
+      <polygon points="28,8 36,8 32,2" fill="#d63c1e" opacity="0.9"/>
+      <circle cx="32" cy="22" r="4" fill="none" stroke="#c9890a" stroke-width="1" opacity="0.8"/>
+      <!-- ruota mulino -->
+      <circle cx="48" cy="44" r="9" fill="none" stroke="#c9890a" stroke-width="1.2" opacity="0.7"/>
+      <line x1="48" y1="35" x2="48" y2="53" stroke="#c9890a" stroke-width="0.8" opacity="0.5"/>
+      <line x1="39" y1="44" x2="57" y2="44" stroke="#c9890a" stroke-width="0.8" opacity="0.5"/>
+      <!-- edificio sx -->
+      <rect x="8" y="30" width="14" height="22" fill="#201810" stroke="#3a2a1a" stroke-width="0.5"/>
+    </svg>
+  </div>
+
+  <div class="splash-title">Un mistero<br><span class="r">tra i portici</span></div>
+
+  <div class="splash-bar-wrap" style="margin-top:2.5rem">
+    <div class="splash-bar"></div>
+  </div>
+
+  <div class="splash-byline">Classe 2^E · Passeggiata Futurista v3.0</div>
+</div>
+
+<div id="app">
+
+<div class="nav-drawer" id="nav-drawer">
+  <div class="nav-overlay" onclick="closeNav()"></div>
+  <div class="nav-panel">
+    <div class="nav-panel-header">
+      <div class="nav-panel-title">Navigazione</div>
+      <button class="nav-close-btn" onclick="closeNav()">✕</button>
+    </div>
+    <div class="nav-items" id="nav-items"></div>
+  </div>
+</div>
+
+<div class="page active" id="home">
+  <button class="nav-menu-btn" onclick="openNav()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <div class="home-content">
+    <div class="home-tag">⚡ Portogruaro · Percorso futurista</div>
+    <div class="home-title">Passeggiata<br><span class="r">Futurista</span></div>
+    <div class="divider"></div>
+    <p class="home-intro">Benvenuto a Portogruaro! Questa mattina nella sala della biblioteca è successa una cosa misteriosa: un quadro legato al Futurismo è scomparso.</p>
+    <div class="city-illo">
+      <svg viewBox="0 0 460 165" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0e0a06"/><stop offset="100%" stop-color="#1e1812"/></linearGradient>
+          <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a2a3a"/><stop offset="100%" stop-color="#0a1520"/></linearGradient>
+        </defs>
+        <rect width="460" height="165" fill="url(#sky)"/>
+        <ellipse cx="230" cy="80" rx="45" ry="30" fill="#c9890a" opacity="0.10"/>
+        <circle cx="230" cy="82" r="12" fill="#c9890a" opacity="0.5"/>
+        <line class="svg-speed-line" x1="0" y1="55" x2="460" y2="45" stroke="#d63c1e" stroke-width="0.4" opacity="0.25"/>
+        <line class="svg-speed-line" x1="0" y1="65" x2="460" y2="52" stroke="#c9890a" stroke-width="0.3" opacity="0.18"/>
+        <line class="svg-speed-line" x1="0" y1="78" x2="460" y2="70" stroke="#d63c1e" stroke-width="0.25" opacity="0.15"/>
+        <rect x="10" y="88" width="50" height="47" fill="#201810" stroke="#3a2a1a" stroke-width="0.5"/>
+        <rect x="64" y="60" width="4" height="8" fill="#2a2010"/><rect x="70" y="60" width="4" height="8" fill="#2a2010"/><rect x="76" y="60" width="4" height="8" fill="#2a2010"/><rect x="82" y="60" width="4" height="8" fill="#2a2010"/><rect x="88" y="60" width="4" height="8" fill="#2a2010"/>
+        <rect x="60" y="68" width="54" height="67" fill="#201810" stroke="#3a2a1a" stroke-width="0.5"/>
+        <g transform="rotate(-1.5, 230, 135)"><rect x="218" y="15" width="24" height="120" fill="#181210" stroke="#2a1e14" stroke-width="0.5"/><rect x="214" y="12" width="32" height="8" fill="#201810"/><circle cx="230" cy="45" r="7" fill="none" stroke="#c9890a" stroke-width="0.8" opacity="0.7"/><polygon points="218,15 242,15 230,0" fill="#d63c1e" opacity="0.7"/></g>
+        <rect x="330" y="80" width="40" height="55" fill="#1a1208" stroke="#2a1e10" stroke-width="0.5"/>
+        <g style="transform-origin:310px 118px; animation: rotateWheel 6s linear infinite;"><circle cx="310" cy="118" r="20" fill="none" stroke="#c9890a" stroke-width="1.5" opacity="0.6"/><line x1="310" y1="98" x2="310" y2="138" stroke="#c9890a" stroke-width="0.8" opacity="0.5"/><line x1="290" y1="118" x2="330" y2="118" stroke="#c9890a" stroke-width="0.8" opacity="0.5"/><line x1="296" y1="104" x2="324" y2="132" stroke="#c9890a" stroke-width="0.6" opacity="0.4"/><line x1="324" y1="104" x2="296" y2="132" stroke="#c9890a" stroke-width="0.6" opacity="0.4"/></g>
+        <rect x="375" y="82" width="60" height="53" fill="#1e1610" stroke="#2a1e14" stroke-width="0.4"/>
+        <rect x="0" y="133" width="460" height="32" fill="url(#water)"/>
+        <line x1="160" y1="147" x2="300" y2="150" stroke="#c9890a" stroke-width="0.4" opacity="0.15"/>
+        <text x="230" y="158" text-anchor="middle" font-family="Georgia, serif" font-size="6" fill="#c9890a" opacity="0.5" letter-spacing="3">PORTOGRUARO</text>
+      </svg>
+    </div>
+    <div class="russolo-quote">«Saluti, rumorosi esploratori! Io sono Russolo, pittore e inventore di suoni. Un quadro è sparito… o forse no… Seguitemi tra ponti, acqua e portici e scoprirete la verità...»</div>
+    <div class="btn-guida-wrap">
+      <div class="btn-guida-label">Leggi prima di iniziare</div>
+      <button class="btn-guida" onclick="showPage('guida')">📖 Guida all'utilizzo</button>
+    </div>
+    <button class="btn-cta" onclick="showPage('percorso')" style="margin-top:1.5rem">INIZIA IL PERCORSO →</button>
+  </div>
+</div>
+
+<div class="page" id="percorso">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showPage('home')">← INDIETRO</button>
+    <div class="page-label">LE 7 TAPPE</div>
+    <div class="progress-dots" id="progress-dots"></div>
+    <button class="nav-menu-btn" onclick="openNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="percorso-header">
+    <p class="percorso-intro">Tocca una tappa per esplorarla. Russolo ha nascosto un indizio in ciascuna — collezionali tutti per risolvere il mistero.</p>
+  </div>
+
+  <div class="mappa-label">📍 MAPPA DEL PERCORSO</div>
+  <div class="mappa-percorso">
+    <svg id="mappa-svg" viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="mapBg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1a1410"/>
+          <stop offset="100%" stop-color="#0e0c08"/>
+        </linearGradient>
+      </defs>
+
+      <rect width="340" height="200" fill="url(#mapBg)"/>
+
+      <line x1="0" y1="50" x2="340" y2="50" stroke="#2a2018" stroke-width="0.5"/>
+      <line x1="0" y1="100" x2="340" y2="100" stroke="#2a2018" stroke-width="0.5"/>
+      <line x1="0" y1="150" x2="340" y2="150" stroke="#2a2018" stroke-width="0.5"/>
+      <line x1="85" y1="0" x2="85" y2="200" stroke="#2a2018" stroke-width="0.5"/>
+      <line x1="170" y1="0" x2="170" y2="200" stroke="#2a2018" stroke-width="0.5"/>
+      <line x1="255" y1="0" x2="255" y2="200" stroke="#2a2018" stroke-width="0.5"/>
+
+      <path d="M0 130 Q60 118 120 128 Q180 138 240 124 Q290 112 340 120"
+            stroke="#1a3a5a" stroke-width="6" fill="none" opacity="0.7"/>
+      <path d="M0 130 Q60 118 120 128 Q180 138 240 124 Q290 112 340 120"
+            stroke="#2a5a8a" stroke-width="2" fill="none" opacity="0.4"/>
+      <text x="10" y="145" font-family="Georgia,serif" font-size="7" fill="#2a5a8a" opacity="0.6" font-style="italic">Fiume Lemene</text>
+
+      <path id="percorso-path"
+            d="M106 178 L48 102 L183 117 L210 119 L220 162 L205 148 L294 44"
+            stroke="#d63c1e" stroke-width="1.5" fill="none"
+            stroke-dasharray="5,4" opacity="0.5"/>
+
+      <!-- 1: Casa Russolo -->
+      <g class="map-pin" id="mpin-0" onclick="openTappa(0)">
+        <circle cx="106" cy="178" r="13" fill="#14100c" stroke="#3a2a1a" stroke-width="1"/><circle class="pin-bg" cx="106" cy="178" r="10" fill="#d63c1e"/>
+        <text x="106" y="182" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="bold" fill="#fff">1</text>
+        <text x="106" y="168" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#f5e4b0" opacity="0.8">Casa Russolo</text>
+      </g>
+
+      <!-- 2: Villa Comunale -->
+      <g class="map-pin" id="mpin-1" onclick="openTappa(1)">
+        <circle cx="48" cy="102" r="13" fill="#14100c" stroke="#3a2a1a" stroke-width="1"/><circle class="pin-bg" cx="48" cy="102" r="10" fill="#d63c1e"/>
+        <text x="48" y="106" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="bold" fill="#fff">2</text>
+        <text x="48" y="119" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#f5e4b0" opacity="0.8">Villa Com.</text>
+      </g>
+
+      <!-- 3: I Mulini sul Lemene -->
+      <g class="map-pin" id="mpin-2" onclick="openTappa(2)">
+        <circle cx="183" cy="117" r="13" fill="#14100c" stroke="#3a2a1a" stroke-width="1"/><circle class="pin-bg" cx="183" cy="117" r="10" fill="#d63c1e"/>
+        <text x="183" y="121" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="bold" fill="#fff">3</text>
+        <text x="183" y="107" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#f5e4b0" opacity="0.8">Mulini</text>
+      </g>
+
+      <!-- 4: Duomo di Sant'Andrea -->
+      <g class="map-pin" id="mpin-3" onclick="openTappa(3)">
+        <circle cx="210" cy="119" r="13" fill="#14100c" stroke="#3a2a1a" stroke-width="1"/><circle class="pin-bg" cx="210" cy="119" r="10" fill="#d63c1e"/>
+        <text x="210" y="123" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="bold" fill="#fff">4</text>
+        <text x="210" y="109" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#f5e4b0" opacity="0.8">Duomo</text>
+      </g>
+
+      <!-- 5: Piazza della Repubblica -->
+      <g class="map-pin" id="mpin-4" onclick="openTappa(4)">
+        <circle cx="220" cy="162" r="13" fill="#14100c" stroke="#3a2a1a" stroke-width="1"/><circle class="pin-bg" cx="220" cy="162" r="10" fill="#d63c1e"/>
+        <text x="220" y="166" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="bold" fill="#fff">5</text>
+        <text x="220" y="179" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#f5e4b0" opacity="0.8">P. Repubblica</text>
+      </g>
+
+      <!-- 6: Palazzo Municipale -->
+      <g class="map-pin" id="mpin-5" onclick="openTappa(5)">
+        <circle cx="205" cy="148" r="13" fill="#14100c" stroke="#3a2a1a" stroke-width="1"/><circle class="pin-bg" cx="205" cy="148" r="10" fill="#d63c1e"/>
+        <text x="205" y="152" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="bold" fill="#fff">6</text>
+        <text x="205" y="138" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#f5e4b0" opacity="0.8">Municipio</text>
+      </g>
+
+      <!-- 7: Teatro Russolo -->
+      <g class="map-pin" id="mpin-6" onclick="openTappa(6)">
+        <circle cx="294" cy="44" r="13" fill="#14100c" stroke="#3a2a1a" stroke-width="1"/><circle class="pin-bg" cx="294" cy="44" r="10" fill="#d63c1e"/>
+        <text x="294" y="48" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="bold" fill="#fff">7</text>
+        <text x="294" y="61" text-anchor="middle" font-family="Arial,sans-serif" font-size="6" fill="#f5e4b0" opacity="0.8">Teatro</text>
+      </g>
+
+      <circle cx="12" cy="188" r="5" fill="#d63c1e"/>
+      <text x="20" y="191" font-family="Arial,sans-serif" font-size="6" fill="#f5e4b0" opacity="0.6">da visitare</text>
+      <circle cx="70" cy="188" r="5" fill="#c9890a"/>
+      <text x="78" y="191" font-family="Arial,sans-serif" font-size="6" fill="#f5e4b0" opacity="0.6">visitata</text>
+    </svg>
+  </div>
+  <div class="tappe-grid" id="tappe-grid"></div>
+
+</div>
+
+<div class="page" id="tappa">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showPage('percorso')">← PERCORSO</button>
+    <div class="progress-dots" id="tappa-dots" style="flex:1;justify-content:center;"></div>
+    <button class="nav-menu-btn" onclick="openNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="tappa-hero" id="tappa-hero">
+    <div class="tappa-hero-emoji" id="hero-emoji"></div>
+    <div class="tappa-hero-overlay">
+      <span id="hero-num"></span>
+      <h2 id="hero-title"></h2>
+    </div>
+  </div>
+  <div id="geo-badge-wrap"></div>
+  <div class="tappa-body">
+    <div class="toggle-row">
+      <button class="toggle-btn active" id="btn-fut" onclick="setMode('fut')">FUTURISTA</button>
+      <button class="toggle-btn" id="btn-norm" onclick="setMode('norm')">NORMALE</button>
+    </div>
+
+    <div class="mode-panel active" id="panel-fut">
+      <p class="testo-futurista" id="txt-fut"></p>
+      <div class="img-frame" id="frame-fut">
+        <div class="img-placeholder">[ IMMAGINE FUTURISTA ]</div>
+      </div>
+      <div class="audio-section">
+        <div class="audio-label">🔊 AUDIO</div>
+        <div class="audio-player-wrap">
+          <button class="audio-play-btn" id="audio-play-btn-fut" onclick="toggleAudio('fut')">▶</button>
+          <div class="audio-info">
+            <div class="audio-name" id="audio-name-fut">Nessun audio</div>
+          </div>
+        </div>
+        <audio id="audio-player-fut" onended="resetAudioBtn('fut')"></audio>
+      </div>
+    </div>
+
+    <div class="mode-panel" id="panel-norm">
+      <p class="testo-normale" id="txt-norm"></p>
+      <div class="img-frame" id="frame-norm">
+        <div class="img-placeholder">[ IMMAGINE REALE ]</div>
+      </div>
+      <div class="audio-section">
+        <div class="audio-label">🔊 AUDIO</div>
+        <div class="audio-player-wrap">
+          <button class="audio-play-btn" id="audio-play-btn-norm" onclick="toggleAudio('norm')">▶</button>
+          <div class="audio-info">
+            <div class="audio-name" id="audio-name-norm">Nessun audio</div>
+          </div>
+        </div>
+        <audio id="audio-player-norm" onended="resetAudioBtn('norm')"></audio>
+      </div>
+    </div>
+
+    <a id="maps-link" class="maps-btn" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Apri in Google Maps
+    </a>
+
+    <div class="indizio-box">
+      <div class="indizio-label">INDIZIO DI RUSSOLO</div>
+      <div class="indizio-text" id="indizio-text"></div>
+    </div>
+
+    <div class="minigame-section">
+      <div class="minigame-header">
+        <div class="minigame-title">🔍 MINI-GIOCO</div>
+        <div style="font-size:11px;font-weight:700;color:rgba(244,237,224,0.45)" id="mini-stato"></div>
+      </div>
+      <div class="minigame-body">
+        <div class="mini-question" id="mini-domanda"></div>
+        <div class="mini-options" id="mini-opzioni"></div>
+        <div class="mini-feedback" id="mini-feedback"></div>
+        <div class="mini-spiegazione" id="mini-spiegazione"></div>
+        <div class="mini-indizio-reveal" id="mini-reveal">
+          <div class="mir-label">PAROLA-INDIZIO SBLOCCATA</div>
+          <div class="mir-word" id="mir-word"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-tappe">
+      <button class="nav-btn" id="btn-prev" onclick="navTappa(-1)">← PREC.</button>
+      <span class="nav-counter" id="nav-counter"></span>
+      <button class="nav-btn" id="btn-next" onclick="navTappa(1)">SUCC. →</button>
+    </div>
+    <div style="padding-top:1rem;text-align:center;padding-bottom:0.5rem;display:none" id="to-quiz-wrap">
+      <button class="btn-cta" onclick="showPage('quiz')" style="align-self:center;margin:0 auto">VAI AL QUIZ →</button>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="quiz">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showPage('percorso')">← PERCORSO</button>
+    <div class="page-label">RISOLVI IL MISTERO</div>
+    <button class="nav-menu-btn" onclick="openNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="quiz-content" id="quiz-content"></div>
+</div>
+
+<div class="page" id="finale">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showPage('home')">← INIZIO</button>
+    <div class="page-label">FINE DEL PERCORSO</div>
+    <button class="nav-menu-btn" onclick="openNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="finale-content">
+    <div class="finale-ornament">◈</div>
+    <div class="finale-title">"Il vero quadro futurista<br>non è su una <em>parete</em>.<br>È la <em>città stessa</em>."</div>
+    <p class="finale-body">Il quadro non era stato rubato. Russolo lo aveva nascosto a posta per costringervi a esplorare Portogruaro con occhi nuovi. Ogni ponte, ogni palazzo, ogni mulino: una pennellata nel grande dipinto vivente della città.</p>
+    <div class="credits">
+      <div class="credits-title">◈ CREDITI DEL PROGETTO</div>
+      <div class="cr"><span>Progetto</span><span>Passeggiata Futurista</span></div>
+      <div class="cr"><span>Luogo</span><span>Portogruaro</span></div>
+      <div class="cr"><span>Designer</span><span>Classe 2^E</span></div>
+      <div class="cr"><span>App</span><span>Passeggiata Futurista v3.0</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="guida">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showPage('home')">← INDIETRO</button>
+    <div class="page-label">Guida all'utilizzo</div>
+    <button class="nav-menu-btn" onclick="openNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="guida-content">
+
+    <div class="guida-intro">
+      Questa app ti guiderà alla scoperta di Portogruaro, la città in cui nacque Luigi Russolo, uno dei protagonisti del Futurismo. Passeggiando tra calli, ponti e piazze, potrai immaginare la città come la vedeva lui: un luogo sospeso tra tradizione e modernità. Attraverso il percorso potrai visitare i suoi luoghi simbolo e risolvere un piccolo mistero…
+    </div>
+
+    <div class="guida-step">
+      <div class="guida-step-icon">🏠</div>
+      <div class="guida-step-body">
+        <div class="guida-step-title">1 · Home</div>
+        <div class="guida-step-text">Dalla pagina iniziale leggi la storia del misterioso quadro scomparso e tocca <strong>Inizia il percorso</strong> per cominciare l'avventura.</div>
+      </div>
+    </div>
+
+    <div class="guida-step">
+      <div class="guida-step-icon">🗺️</div>
+      <div class="guida-step-body">
+        <div class="guida-step-title">2 · Le 7 tappe</div>
+        <div class="guida-step-text" id="guida-step2-text">Visualizzi una griglia con le 7 tappe del percorso. Tocca una card per aprire la pagina del luogo. Le tappe già visitate mostrano un <strong>segno di spunta ✓</strong> dorato.</div>
+      </div>
+    </div>
+
+    <div class="guida-step">
+      <div class="guida-step-icon">📖</div>
+      <div class="guida-step-body">
+        <div class="guida-step-title">3 · Modalità Normale / Futurista</div>
+        <div class="guida-step-text">In ogni tappa puoi scegliere tra due modalità: <strong>Normale</strong> per una descrizione storica del luogo, <strong>Futurista</strong> per un testo creativo ispirato al Futurismo.</div>
+      </div>
+    </div>
+
+    <div class="guida-step">
+      <div class="guida-step-icon">🔍</div>
+      <div class="guida-step-body">
+        <div class="guida-step-title">4 · Indizio e Mini-gioco</div>
+        <div class="guida-step-text">In ogni tappa trovi un <strong>indizio di Russolo</strong> e un <strong>mini-gioco</strong>: rispondi correttamente alla domanda per sbloccare la <strong>parola-indizio</strong> della tappa.</div>
+      </div>
+    </div>
+
+    <div class="guida-step">
+      <div class="guida-step-icon">🔊</div>
+      <div class="guida-step-body">
+        <div class="guida-step-title">5 · Audio</div>
+        <div class="guida-step-text">In ogni tappa potrai ascoltare i rumori dell'ambiente oppure una composizione musicale futurista. Premi ▶ per riprodurla e ■ per fermarla.</div>
+      </div>
+    </div>
+
+    <div class="guida-step">
+      <div class="guida-step-icon">📍</div>
+      <div class="guida-step-body">
+        <div class="guida-step-title">6 · Posizione e Navigazione</div>
+        <div class="guida-step-text">Ogni tappa mostra un <strong>badge GPS</strong> con la tua distanza dal luogo: 🟢 verde (≤ 80 m, sei arrivato!), 🟡 giallo (≤ 400 m), ⚫ grigio (distanza in km). Se vedi <em>"Rilevamento posizione…"</em> abilita il GPS del dispositivo.<br><br>Usa il pulsante <strong>Apri in Google Maps</strong> per raggiungere la tappa a piedi.</div>
+      </div>
+    </div>
+
+    <div class="guida-step">
+      <div class="guida-step-icon">🔑</div>
+      <div class="guida-step-body">
+        <div class="guida-step-title">7 · Parola del Mistero</div>
+        <div class="guida-step-text" id="guida-step7-text">Ogni mini-gioco completato correttamente sblocca una <strong>parola-indizio</strong> della tappa. Quando tutte e 7 le parole sono sbloccate, nel quiz apparirà la <strong>frase segreta</strong> che svela l'identità del colpevole — e la soluzione narrativa del mistero.</div>
+      </div>
+    </div>
+
+    <div class="guida-step">
+      <div class="guida-step-icon">🏆</div>
+      <div class="guida-step-body">
+        <div class="guida-step-title">8 · Quiz finale</div>
+        <div class="guida-step-text">Dopo aver visitato tutte le tappe, accedi al <strong>Quiz finale</strong> per risolvere il mistero del quadro scomparso e scoprire la verità.</div>
+      </div>
+    </div>
+
+    <div class="guida-step">
+      <div class="guida-step-icon">☰</div>
+      <div class="guida-step-body">
+        <div class="guida-step-title">9 · Menu di navigazione</div>
+        <div class="guida-step-text">Il pulsante <strong>☰</strong> in alto a destra nella home apre il menu di navigazione rapida: puoi saltare direttamente a qualsiasi tappa o sezione dell'app.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem;background:var(--nero);border-radius:var(--radius);padding:1rem 1.1rem;border-left:4px solid var(--oro);">
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;color:var(--oro);margin-bottom:0.85rem;">💡 Consigli pratici</div>
+      <div style="display:flex;flex-direction:column;gap:0.6rem;">
+        <div style="font-size:0.88rem;color:rgba(244,237,224,0.75);line-height:1.6;">• Visita le tappe nell'ordine che preferisci: non è obbligatorio seguire la sequenza numerica.</div>
+        <div style="font-size:0.88rem;color:rgba(244,237,224,0.75);line-height:1.6;">• I progressi vengono salvati automaticamente: se chiudi l'app e la riapri, le tappe già visitate risulteranno completate.</div>
+        <div style="font-size:0.88rem;color:rgba(244,237,224,0.75);line-height:1.6;">• Per azzerare tutto e ricominciare, usa <strong style="color:var(--crema)">"↺ Azzera progressi"</strong> nel menu ☰ o qui in basso.</div>
+      </div>
+    </div>
+
+    <button class="guida-cta-btn" onclick="showPage('percorso')">
+      <div class="guida-cta-icon">🗺️</div>
+      <div class="guida-cta-body">
+        <div class="guida-cta-title">Il viaggio comincia qui</div>
+        <div class="guida-cta-sub">Vai alle 7 tappe →</div>
+      </div>
+    </button>
+
+    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1.5px solid var(--crema2);text-align:center;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:0.12em;color:var(--testo-l);text-transform:uppercase;margin-bottom:0.75rem;">⚙ Gestione progressi</div>
+      <button class="reset-btn" onclick="resetProgress()">↺ Azzera progressi e ricomincia</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ CREDITS PAGE ══════════ -->
+<div class="page" id="credits">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showPage('home')">← INDIETRO</button>
+    <div class="page-label">CREDITS</div>
+    <button class="nav-menu-btn" onclick="openNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="credits-page-content">
+
+    <div class="credits-hero">
+      <div class="credits-hero-ornament">◈</div>
+      <div class="credits-hero-title">Passeggiata<br>Futurista</div>
+      <div class="credits-hero-sub">Portogruaro · 2026</div>
+    </div>
+    <div class="credits-divider"></div>
+
+    <!-- Quadro immagine studenti -->
+    <div class="credits-block" style="margin-bottom:1rem;">
+      <div style="width:100%;aspect-ratio:4/3;background:var(--nero2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;border-top:1px solid var(--grigio);position:relative;overflow:hidden;" id="credits-img-wrap">
+        <img id="credits-img-preview" src="https://i.imgur.com/1cNvGTi.jpeg" alt="Classe 2^E" style="display:block;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;"/>
+      </div>
+    </div>
+
+    <div class="credits-block">
+      <div class="credits-block-title">📌 Progetto</div>
+      <div class="credits-row">
+        <span class="credits-row-label">Nome</span>
+        <span class="credits-row-value">Passeggiata Futurista</span>
+      </div>
+      <div class="credits-row">
+        <span class="credits-row-label">Versione</span>
+        <span class="credits-row-value">v3.0</span>
+      </div>
+      <div class="credits-row">
+        <span class="credits-row-label">Anno</span>
+        <span class="credits-row-value">2026</span>
+      </div>
+
+    </div>
+
+    <div class="credits-block" style="margin-bottom:1rem;">
+      <div style="width:100%;aspect-ratio:4/3;background:var(--nero2);border-top:1px solid var(--grigio);position:relative;overflow:hidden;cursor:pointer;" id="credits-img2-wrap" onclick="toggleCreditsImg()">
+        <img id="credits-toggle-img" src="https://i.imgur.com/XnyVp2j.jpg" alt="Foto classe" style="display:block;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;transition:opacity 0.3s ease;"/>
+        <div style="position:absolute;bottom:8px;right:8px;background:rgba(20,16,12,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:5px;padding:0.3rem 0.6rem;font-size:10px;font-weight:800;letter-spacing:0.08em;color:rgba(244,237,224,0.75);text-transform:uppercase;pointer-events:none;" id="credits-toggle-hint">tocca per cambiare ↔</div>
+      </div>
+    </div>
+
+    <div class="credits-block">
+      <div class="credits-block-title">👥 Autori</div>
+      <div class="credits-row">
+        <span class="credits-row-label">Progettazione</span>
+        <span class="credits-row-value">Classe 2^E</span>
+      </div>
+      <div class="credits-row">
+        <span class="credits-row-label">Testi</span>
+        <span class="credits-row-value">Classe 2^E</span>
+      </div>
+      <div class="credits-row">
+        <span class="credits-row-label">Immagini</span>
+        <span class="credits-row-value">Classe 2^E</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ RIEPILOGO / CERTIFICATO ══════════ -->
+<div class="page" id="riepilogo">
+  <div class="top-bar">
+    <button class="back-btn" onclick="showPage('quiz')">← QUIZ</button>
+    <div class="page-label">CERTIFICATO</div>
+    <button class="nav-menu-btn" onclick="openNav()" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="riepilogo-content">
+    <div class="riepilogo-star">🏆</div>
+    <div class="riepilogo-title">Indagatore Futurista</div>
+
+    <div class="cert-card" id="cert-card">
+      <div class="cert-header">
+        <div class="cert-ornament-line"><span class="cert-ornament-text">Passeggiata Futurista</span></div>
+        <div class="cert-header-title">Certificato<br>di completamento</div>
+        <div class="cert-header-sub">Portogruaro · Percorso Russolo</div>
+      </div>
+      <div class="cert-body">
+        <div class="cert-label">◈ statistiche del percorso</div>
+        <div class="cert-stats">
+          <div class="cert-stat">
+            <div class="cert-stat-num">7</div>
+            <div class="cert-stat-label">Tappe percorse</div>
+          </div>
+          <div class="cert-stat">
+            <div class="cert-stat-num">7</div>
+            <div class="cert-stat-label">Indizi trovati</div>
+          </div>
+          <div class="cert-stat">
+            <div class="cert-stat-num cert-stat-num-mystery">1</div>
+            <div class="cert-stat-label">Mistero risolto</div>
+          </div>
+        </div>
+        <div class="cert-divider"></div>
+        <div class="cert-total-stars" id="cert-total-stars"></div>
+      </div>
+      <div class="cert-footer">
+        <span class="cert-footer-left">Classe 2^E · 2026</span>
+        <span class="cert-footer-right">✓ COMPLETATO</span>
+      </div>
+    </div>
+
+    <canvas id="cert-canvas" width="760" height="540"></canvas>
+
+    <button class="cert-dl-btn" onclick="downloadCertificate()">
+      ⬇ Scarica il certificato
+    </button>
+    <button class="cert-finale-btn" onclick="showPage('finale')">
+      Scopri il finale →
+    </button>
+  </div>
+</div>
+
+</div>
+
+<script>
+
+const tappe = [
+  {
+    num: "01", nome: "Casa Russolo", emoji: "📚",
+    colore: "#14100a", accento: "#d4a017",
+    normale: "Palazzo Altan-Venanzio è un edificio rinascimentale che ospita la Biblioteca Civica e il Museo Casa Russolo, dedicato al celebre pittore e musicista futurista Luigi Russolo (1885–1947), nato proprio a Portogruaro. Il museo conserva documenti, fotografie e riproduzioni dei suoi intonarumori — gli strumenti musicali a rumore che inventò nel 1913. È il punto di partenza ideale per scoprire come un ragazzo di questa città divenne uno dei protagonisti dell'avanguardia europea.",
+    futurista: "Palazzo di libri! Energia silenziosa nel cuore di Portogruaro — stanze piene di parole, idee che scattano nella mente.\nTra queste mura nacque Luigi Russolo.\nQui la memoria incontra il domani: libri, arte, pensieri veloci — scintille di cultura che corrono.",
+    indizio: "«Un quadro è sparito dalla mia casa. Ma forse… non era davvero scomparso. Iniziate qui la vostra caccia.»",
+    domanda: "Quale oggetto è scomparso nella biblioteca?",
+    opzioni: ["Un busto in marmo", "Quadro futurista", "Un manoscritto antico", "Una mappa del '700"],
+    corretta: 1,
+    parola: "portogruarese",
+    spiegazione: "Il quadro futurista è il fulcro del nostro mistero. Luigi Russolo nacque a Portogruaro nel 1885 e divenne uno dei protagonisti del Futurismo. Inventò gli intonarumori nel 1913: strumenti capaci di riprodurre i rumori della modernità.",
+    lat: 45.775169116463246, lng: 12.835103711247292,
+    imgFut: "https://i.imgur.com/Gfca9P9.jpg",
+    imgFut2: "https://i.imgur.com/5KZvszw.jpg",
+    imgNorm: "https://www.dropbox.com/scl/fi/6dpol2j7pbhlug2mzq1ms/biblioteca_home.jpg?rlkey=rgk4wpua2iuujj4ozfchpvu4v&dl=1",
+    audioFut: "https://www.dropbox.com/scl/fi/hau3rwu2w0omchguhozaj/Luigi-Russolo-Gracidatore.mp3?rlkey=pe135erbq8ia4fkzchsw0ojir&dl=1",
+    audioFutLabel: "Gracidatore",
+    audioNorm: "https://www.dropbox.com/scl/fi/7g4yad0antt976j8kwni2/Casa-Russolo.mp3?rlkey=e22egodd0hs6s2ohjqdxeq13g&dl=1",
+    audioNormLabel: "Casa Russolo",
+  },
+  {
+    num: "02", nome: "Villa Comunale", emoji: "🌿",
+    colore: "#040e04", accento: "#3b6d11",
+    normale: "La Villa Comunale (ex Marzotto) è uno storico palazzo rinascimentale del XVI secolo che oggi ospita il Comune e il Museo Gortani. Simbolo del legame con Venezia e fonte d'ispirazione per Ippolito Nievo, rappresenta il cuore culturale e civile di Portogruaro.",
+    futurista: "Villa viva! Antica casa di pietra nel cuore di Portogruaro — oggi piena di voci, idee che scorrono veloci come energia. Qui batte la memoria della città: stanze che custodiscono storie e oggetti, un luogo che accende pensieri e curiosità. Tra queste mura passò anche l'immaginazione di Ippolito Nievo — scintilla di parole che corre dal passato al futuro!",
+    indizio: "«La natura è il mio intonarumori più antico. Questo è il cuore della città — e il vostro viaggio prosegue.»",
+    domanda: "Quale scrittore trovò ispirazione nella Villa Comunale?",
+    opzioni: ["Giacomo Leopardi", "Alessandro Manzoni", "Ippolito Nievo", "Carlo Goldoni"],
+    corretta: 2,
+    parola: "il",
+    spiegazione: "Ippolito Nievo (1831–1861), autore delle 'Confessioni di un italiano', trovò ispirazione proprio tra i luoghi e le famiglie di Portogruaro. La Villa Comunale fu anche sede del Podestà veneziano.",
+    lat: 45.776717493066066, lng: 12.833838374359457,
+    imgFut: "https://i.imgur.com/vE3yDFB.jpg",
+    imgNorm: "https://i.imgur.com/FEQUoBb.jpg",
+    audioFut: "https://www.dropbox.com/scl/fi/6cfh09ot51plbdt2ijqps/Luigi-Russolo-Arco-Enarmonico.mp3?rlkey=v6zf6kt3fyl7977cnf61jafsy&dl=1",
+    audioFutLabel: "Arco enarmonico",
+    audioNorm: "https://www.dropbox.com/scl/fi/7ul8o1jmlcg5h2rp6rx4b/villa-comunale.mp3?rlkey=pn3lgxlrnyhpqtzgd8ac8w2aj&dl=1",
+    audioNormLabel: "Villa Comunale"
+  },
+  {
+    num: "03", nome: "I Mulini sul Lemene", emoji: "⚙️",
+    colore: "#080e18", accento: "#378add",
+    normale: "I mulini di Portogruaro erano antichi mulini ad acqua costruiti sul fiume Lemene, usati per macinare il grano già nel Medioevo. Furono molto importanti per l'economia locale perché permettevano la produzione di farina per la città e i villaggi vicini. Con il tempo persero la loro funzione industriale e oggi rimangono come testimonianza storica della vita e del lavoro di un tempo.",
+    futurista: "Mulino d'acqua! Ruota che gira sul Lemene nel cuore di Portogruaro — forza semplice che macina grano e muove la città. Gira, gira! Energia del fiume che diventa farina per case, strade, villaggi vicini. Oggi resta fermo ma parla ancora: memoria di lavoro, ingranaggio antico che continua a ronzare nel tempo!",
+    indizio: "«L'acqua trasforma il grano come l'arte trasforma la realtà. Cosa muoveva questi giganti?»",
+    domanda: "Quale elemento muoveva i mulini sul Lemene?",
+    opzioni: ["Il vento", "Il fuoco", "L'acqua", "La forza dei buoi"],
+    corretta: 2,
+    parola: "pittore",
+    spiegazione: "I mulini erano mossi dalla forza dell'acqua del fiume Lemene. La corrente faceva girare le grandi ruote che azionavano le macine per il grano. Russolo si ispirò a questi suoni meccanici per i suoi intonarumori.",
+    lat: 45.77641069353244, lng: 12.83678880407973,
+    imgFut: "https://i.imgur.com/E1lw8md.jpg",
+    imgNorm: "https://www.dropbox.com/scl/fi/lsyu9zor2itu3hu4e3nf4/Mulini.jpg?rlkey=s1vmv36462kj2bom3po1brset&dl=1",
+    audioFut: "https://www.dropbox.com/scl/fi/92pa90nas9wtxrsa6fvh0/Luigi-Russolo-Gorgogliatore.mp3?rlkey=ltj6w32hcbhrzciptyit5rexe&dl=1",
+    audioFutLabel: "Gorgogliatore",
+    audioNorm: "https://www.dropbox.com/scl/fi/7zapfeq13kuexjem9ndn7/Mulini.mp3?rlkey=tf7o71d56f72ekas7i4jl0mry&dl=1",
+    audioNormLabel: "I Mulini sul Lemene"
+  },
+  {
+    num: "04", nome: "Duomo di Sant'Andrea", emoji: "⛪",
+    colore: "#120808", accento: "#e85d20",
+    normale: "Il Duomo di Sant'Andrea è una maestosa chiesa che custodisce tesori d'arte veneziana e domina la piazza principale. È celebre per il suo campanile pendente, simbolo inconfondibile della città di Portogruaro.",
+    futurista: "Grande casa di silenzio e luce nel cuore di Portogruaro — guarda la piazza come un gigante calmo.\nDentro brillano immagini e colori nati dalla mano degli artisti di Venezia.\nTorre di mattoni! Sale nel cielo di Portogruaro — ma piega, sfida la gravità, come se volesse correre di lato nel vento.\nIl terreno la spinge, lei resiste: inclinata, viva, audace, macchina di pietra che non cade. Tra equilibrio e pericolo, freccia obliqua lanciata nel futuro!",
+    indizio: "«Le mie macchine di rumore non sono campane, eppure ci assomigliano. A quale santo è dedicato questo luogo?»",
+    domanda: "A quale santo è dedicato il Duomo?",
+    opzioni: ["San Pietro", "San Marco", "Sant'Andrea", "Santa Maria"],
+    corretta: 2,
+    parola: "Luigi Russolo",
+    spiegazione: "Il Duomo di Sant'Andrea è dedicato all'apostolo Andrea, fratello di Pietro. Il suo campanile pendente — inclinato per via del terreno — è uno dei simboli più riconoscibili di Portogruaro, visibile da tutta la piazza.",
+    lat: 45.77637327883968, lng: 12.837368161188436,
+    imgFut: "https://i.imgur.com/xvE0c03.png",
+    imgNorm: "https://www.dropbox.com/scl/fi/jgioylox2qsccobszrfke/duomo.png?rlkey=0houet24j5ckcv79azhabld7d&dl=1",
+    audioFut: "https://www.dropbox.com/scl/fi/1x3al32p73zcea356msil/Luigi-Russolo-Ronzatore-1.mp3?rlkey=tq8x3dx30sir3uc611jhbri80&dl=1",
+    audioFutLabel: "Ronzatore",
+    audioNorm: "https://www.dropbox.com/scl/fi/8y6paf6bba002orbc7nfs/Duomo.mp3?rlkey=sdoqs7720orkzp0qvb2tg897a&dl=1",
+    audioNormLabel: "Duomo di Sant'Andrea",
+  },
+  {
+    num: "05", nome: "Piazza della Repubblica e Monumento ai caduti", emoji: "🐴",
+    colore: "#120c0a", accento: "#c8341a",
+    normale: "Piazza della Repubblica è il cuore civile di Portogruaro, dominata dal Monumento ai Caduti che raffigura un cavallo rampante. Il monumento, inaugurato dopo la Prima Guerra Mondiale, è un potente simbolo della memoria collettiva della città. La piazza è fiancheggiata da eleganti portici e palazzi storici che testimoniano il passato veneziano di Portogruaro.",
+    futurista: "Senti il cavallo di pietra, nitrisce e trotta, galoppa per Portogruaro e cresce sempre di più, passo dopo passo, pietra dopo pietra. Non serve vederlo, serve sentirlo, dorme di notte sbuffando e si sveglia saltellando pronto per il nuovo giorno.",
+    indizio: "«Il cavallo di pietra conosce ogni strada di questa città. Cercate dove la memoria si fa monumento.»",
+    domanda: "Cosa raffigura il monumento in questa piazza?",
+    opzioni: ["Un leone alato", "Un soldato a cavallo", "Un soldato", "Una fontana"],
+    corretta: 1,
+    parola: "colpevole",
+    spiegazione: "Il monumento raffigura un soldato a cavallo in posa eroica, inaugurato dopo la Prima Guerra Mondiale. I futuristi amavano il cavallo come simbolo di velocità e forza — Russolo stesso avrebbe apprezzato questa scultura dinamica.",
+    lat: 45.77562299824766, lng: 12.837456053576577,
+    imgFut: "https://i.imgur.com/O1b7yn1.png",
+    imgFutPosition: "top",
+    imgNorm: "https://www.dropbox.com/scl/fi/3pegaajih3kmc6v9a6sh3/monumento-ai-caduti_home.png?rlkey=hyx8lqvd6jqh4u6txmlcv02eu&dl=1",
+    audioFut: "https://www.dropbox.com/scl/fi/1wjidc7qd8x1i62o6uowe/Luigi-Russolo-Crepitatore.mp3?rlkey=xuc0m913mergcjrgmx958mv3p&dl=1",
+    audioFutLabel: "Crepitatore",
+    audioNorm: "https://www.dropbox.com/scl/fi/u28ac1z4raxq45vy89zty/piazza-della-repubblica.mp3?rlkey=jp5nxi7n0wve588z32spk1v7r&dl=1",
+    audioNormLabel: "Piazza della Repubblica"
+  },
+  {
+    num: "06", nome: "Palazzo Municipale", emoji: "🏛",
+    colore: "#0c0c08", accento: "#639922",
+    normale: "Costruito in stile gotico tra il 1372 e il 1380, il Municipio è il simbolo di Portogruaro e antica sede del Podestà veneziano. Caratterizzato dalla facciata in mattoni a vista e dalla merlatura ghibellina, fu ampliato nel XVI secolo utilizzando le pietre del castello cittadino. Al suo interno ospita la prestigiosa Sala Consiliare, mentre all'esterno è affiancato dal celebre pozzetto del Pilacorte.",
+    futurista: "Edificio di mattoni nel cuore di Portogruaro e casa del capo che guidava la città: energia, decisioni, voci che rimbalzano nelle stanze. Fuori brilla il piccolo pozzo sotto le arcate dei portici, frùì di piccioni invadenti, leggero brumm brumm di auto.",
+    indizio: "«Tra queste mura si decidevano i destini della città. Cercate l'anno in cui tutto ebbe inizio.»",
+    domanda: "In quale stile architettonico è costruito il Palazzo Municipale?",
+    opzioni: ["Barocco", "Rinascimentale", "Gotico", "Neoclassico"],
+    corretta: 2,
+    parola: "è",
+    spiegazione: "Il Palazzo Municipale è un capolavoro del gotico veneziano, costruito tra il 1372 e il 1380. La merlatura ghibellina a coda di rondine e i mattoni a vista lo rendono un esempio perfetto dell'architettura medievale padovano-veneziana.",
+    lat: 45.77576050176602, lng: 12.837441310345234,
+    imgFut: "https://i.imgur.com/wcw6Kb3.jpg",
+    imgNorm: "https://www.dropbox.com/scl/fi/sf6udrsk7p0udtra7izqa/municipio.jpg?rlkey=50lhce5imvnupqikl62pi7wo3&dl=1",
+    audioFut: "https://www.dropbox.com/scl/fi/y0dsqq0ez3mlhtb8ru4c1/Luigi-Russolo-Ululatore.mp3?rlkey=0xov257ywnx46ngklxwmjq28z&dl=1",
+    audioFutLabel: "Ululatore",
+    audioNorm: "https://www.dropbox.com/scl/fi/k2gu91xr4g57f3caiejqi/Municipio.mp3?rlkey=g23d9yuj85i97a7fwagu74xk7&dl=1",
+    audioNormLabel: "Palazzo Municipale",
+  },
+  {
+    num: "07", nome: "Teatro Russolo", emoji: "🎭",
+    colore: "#080812", accento: "#534ab7",
+    normale: "Il Teatro Luigi Russolo è un moderno spazio culturale inaugurato nel 2009 e dedicato al celebre musicista futurista locale. Caratterizzato da un'eccellente acustica e da una ricca programmazione, rappresenta il cuore pulsante delle arti performative a Portogruaro.",
+    futurista: "Teatro-macchina! Luci, suoni, movimento nel cuore di Portogruaro — spazio vivo dove parole, musica e corpi scattano come motori. Nome lanciato nel futuro: Luigi Russolo, maestro dei rumori, energia sonora che vibra nelle pareti. Qui la città respira arte: palco acceso, pubblico in tensione — scintille di spettacolo che corrono veloci nella notte!",
+    indizio: "«Il mio nome è inciso su questo palco. La musica del futuro risuona ancora tra queste mura.»",
+    domanda: "In quale anno è stato inaugurato il Teatro Russolo?",
+    opzioni: ["1985", "1999", "2009", "2015"],
+    corretta: 2,
+    parola: "il",
+    spiegazione: "Il Teatro Russolo è stato inaugurato nel 2009 ed è intitolato a Luigi Russolo in onore del grande musicista e pittore futurista nato a Portogruaro. Con la sua eccellente acustica ospita concerti, spettacoli e rassegne culturali durante tutto l'anno.",
+    lat: 45.7778299745006, lng: 12.839211726588786,
+    imgFut: "https://i.imgur.com/39mpxTh.jpg",
+    imgNorm: "https://www.dropbox.com/scl/fi/5i9ugzedmfcxbepjbujil/teatro-russolo.jpg?rlkey=diaecigra7hmp8i2rkae8jff7&dl=1",
+    audioFut: "https://www.dropbox.com/scl/fi/3g7oao03uw73bhjrev6va/Antonio-Russolo-Serenata.mp3?rlkey=63fv0n2bv1fp8nlj4a88nsxwa&dl=1",
+    audioFutLabel: "Serenata",
+    audioNorm: "https://www.dropbox.com/scl/fi/t8efosux35xdpz3ikz8y1/Teatro-Russolo.mp3?rlkey=hqqjqg7gtjey5v7wvcp8mmes8&dl=1",
+    audioNormLabel: "Teatro Russolo",
+  }
+];
+
+let currentTappa = 0;
+let visited = new Set();
+let miniCompleted = {};
+let miniStars = {};          // {tappaIdx: 1|2|3} stelle guadagnate
+let miniWrongAttempts = {};  // {tappaIdx: count} tentativi errati
+let tappaOpenTime = null;    // timestamp apertura tappa (per calcolo velocità)
+let currentMode = 'fut';
+let ordineUtente = [];    // Bug 3 fix: dichiarata qui per essere disponibile a loadProgress
+let celebrationShown = false; // Bug 6 fix: dichiarata qui per essere disponibile a loadProgress
+
+// ── PERSISTENZA localStorage ───────────────────────
+const PROGRESS_VERSION = 'v4';
+
+function saveProgress() {
+  try {
+    localStorage.setItem('pf_version', PROGRESS_VERSION);
+    localStorage.setItem('pf_visited', JSON.stringify([...visited]));
+    localStorage.setItem('pf_miniCompleted', JSON.stringify(miniCompleted));
+    localStorage.setItem('pf_miniStars', JSON.stringify(miniStars));
+    localStorage.setItem('pf_miniWrong', JSON.stringify(miniWrongAttempts));
+    localStorage.setItem('pf_ordine', JSON.stringify(ordineUtente));
+    localStorage.setItem('pf_celebShown', celebrationShown ? '1' : '0');
+  } catch(e) {}
+}
+function loadProgress() {
+  try {
+    if (localStorage.getItem('pf_version') !== PROGRESS_VERSION) {
+      ['pf_version','pf_visited','pf_miniCompleted','pf_miniStars','pf_miniWrong',
+       'pf_quizAnswers','pf_ordine','pf_celebShown'].forEach(k => localStorage.removeItem(k));
+      return;
+    }
+    const v  = localStorage.getItem('pf_visited');
+    const m  = localStorage.getItem('pf_miniCompleted');
+    const ms = localStorage.getItem('pf_miniStars');
+    const mw = localStorage.getItem('pf_miniWrong');
+    const o  = localStorage.getItem('pf_ordine');
+    const cel = localStorage.getItem('pf_celebShown');
+    if (v)  visited = new Set(JSON.parse(v));
+    if (m)  miniCompleted = JSON.parse(m);
+    if (ms) miniStars = JSON.parse(ms);
+    if (mw) miniWrongAttempts = JSON.parse(mw);
+    if (o)  ordineUtente = JSON.parse(o);
+    if (cel) celebrationShown = cel === '1';
+  } catch(e) {}
+}
+function resetProgress() {
+  if (!confirm('Sei sicuro di voler azzerare tutti i progressi?')) return;
+  try { ['pf_version','pf_visited','pf_miniCompleted','pf_miniStars','pf_miniWrong','pf_ordine','pf_celebShown'].forEach(k => localStorage.removeItem(k)); } catch(e) {}
+  visited = new Set(); miniCompleted = {}; miniStars = {}; miniWrongAttempts = {}; ordineUtente = [];
+  celebrationShown = false; tappaOpenTime = null;
+  showPage('home');
+}
+loadProgress();
+
+// ── AUDIO HELPERS ──────────────────────────────────
+function audioEls(mode) {
+  return {
+    player: document.getElementById('audio-player-' + mode),
+    btn:    document.getElementById('audio-play-btn-' + mode),
+    name:   document.getElementById('audio-name-' + mode)
+  };
+}
+
+// ── STOP AUDIO GLOBALE ─────────────────────────────
+function stopAllAudio() {
+  ['fut','norm'].forEach(mode => {
+    const { player, btn } = audioEls(mode);
+    if (player && !player.paused) { player.pause(); if (btn) btn.textContent = '▶'; }
+  });
+}
+
+function showPage(id) {
+  stopAllAudio();
+  if (id !== 'tappa') stopGeo();
+  if (id === 'quiz' && !canAccessQuiz()) { showQuizLocked(); return; }
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  if (id === 'percorso') renderPercorso();
+  if (id === 'quiz') renderQuiz();
+  if (id === 'riepilogo') renderRiepilogo();
+}
+
+function renderPercorso() {
+  const grid = document.getElementById('tappe-grid');
+  grid.innerHTML = '';
+  tappe.forEach((t, i) => {
+    const isVisited = visited.has(i);
+    const card = document.createElement('div');
+    card.className = 'tappa-card' + (isVisited ? ' visited-card' : '');
+    card.innerHTML = `
+      <div class="tappa-card-thumb" style="background:${t.colore};border-bottom:2px solid ${t.accento}">
+        <span class="emoji-fallback">${t.emoji}</span>
+        ${isVisited ? `<div class="visited-badge">✓</div>` : ''}
+      </div>
+      <div class="tappa-card-body">
+        <div class="tappa-num">TAPPA ${t.num}</div>
+        <div class="tappa-name">${t.nome}</div>
+        ${isVisited && miniStars[i] ? `<div class="card-stars">${[1,2,3].map(n => `<span class="card-star${n <= miniStars[i] ? ' lit' : ''}">⭐</span>`).join('')}</div>` : ''}
+      </div>`;
+    card.onclick = () => openTappa(i);
+    grid.appendChild(card);
+    // Aggiorna pin mappa
+    const pin = document.getElementById('mpin-' + i);
+    if (pin) {
+      const pinBg = pin.querySelector('.pin-bg');
+      const pinTxt = pin.querySelector('text');
+      if (isVisited) {
+        pin.classList.add('visited-pin');
+        if (pinBg) pinBg.setAttribute('fill', '#c9890a');
+        if (pinTxt) pinTxt.setAttribute('fill', '#14100c');
+      } else {
+        pin.classList.remove('visited-pin');
+        if (pinBg) pinBg.setAttribute('fill', '#d63c1e');
+        if (pinTxt) pinTxt.setAttribute('fill', '#fff');
+      }
+    }
+  });
+  renderProgressDots('progress-dots');
+}
+
+function renderProgressDots(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  // Per il contesto tappa usiamo il containerId come indicatore diretto,
+  // senza dipendere da classList.contains('active') che sarebbe sempre false
+  // durante renderTappa() (showPage viene chiamata dopo).
+  const isTappaCtx = containerId === 'tappa-dots';
+  el.innerHTML = tappe.map((_, i) => {
+    let cls = 'dot';
+    if (isTappaCtx && i === currentTappa) cls += ' current';
+    else if (!isTappaCtx && i === currentTappa && document.getElementById('tappa').classList.contains('active')) cls += ' current';
+    else if (visited.has(i)) cls += ' visited';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+}
+
+function openTappa(idx) {
+  currentTappa = idx;
+  visited.add(idx);
+  saveProgress();
+  renderTappa(idx);
+  showPage('tappa');
+  startGeo(idx);
+}
+
+function renderTappa(idx) {
+  const t = tappe[idx];
+
+  renderProgressDots('tappa-dots');
+
+  // Hero
+  document.getElementById('hero-emoji').textContent = t.emoji;
+  document.getElementById('hero-num').textContent = `TAPPA ${t.num}`;
+  document.getElementById('hero-title').textContent = t.nome;
+
+  // Testi
+  document.getElementById('txt-norm').textContent = t.normale;
+  document.getElementById('txt-fut').textContent = t.futurista;
+
+  // Immagini con lazy loading + skeleton + error handling
+  function loadImg(frameId, src, alt, position) {
+    const frame = document.getElementById(frameId);
+    if (!src) { frame.innerHTML = `<div class="img-placeholder">[ IMMAGINE NON DISPONIBILE ]</div>`; return; }
+    frame.innerHTML = `<div class="img-skeleton"></div>`;
+    const img = new Image();
+    img.onload = () => { frame.innerHTML = ''; frame.appendChild(img); };
+    img.onerror = () => { frame.innerHTML = `<div class="img-error"><span>⚠</span><span>Immagine non disponibile</span></div>`; };
+    img.src = src; img.alt = alt;
+    img.style.cssText = `width:100%;height:100%;object-fit:cover;border-radius:var(--radius);object-position:${position || 'center'};`;
+  }
+  const frameFut = document.getElementById('frame-fut');
+  frameFut.onclick = null;
+  frameFut.style.cursor = '';
+  if (t.imgFut2) {
+    frameFut.innerHTML = '<div class="img-skeleton"></div>';
+    const imgs = [t.imgFut, t.imgFut2];
+    let idx = 0;
+    const imgEl = document.createElement('img');
+    imgEl.alt = 'Immagine futurista';
+    imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;border-radius:var(--radius);object-position:' + (t.imgFutPosition||'center') + ';transition:opacity 0.2s ease;';
+    let setupDone = false;
+    imgEl.onload = () => {
+      if (!setupDone) {
+        // Prima volta: costruisce il DOM
+        setupDone = true;
+        frameFut.innerHTML = '';
+        frameFut.appendChild(imgEl);
+        const hint = document.createElement('div');
+        hint.style.cssText = 'position:absolute;bottom:8px;right:8px;background:rgba(20,16,12,0.7);border:1px solid rgba(255,255,255,0.15);border-radius:5px;padding:0.3rem 0.6rem;font-size:10px;font-weight:800;letter-spacing:0.08em;color:rgba(244,237,224,0.75);text-transform:uppercase;pointer-events:none;';
+        hint.textContent = 'tocca per cambiare \u2194';
+        frameFut.appendChild(hint);
+      } else {
+        // Cambio immagine: ripristina solo l'opacità
+        imgEl.style.opacity = '1';
+      }
+    };
+    imgEl.onerror = () => { frameFut.innerHTML = '<div class="img-error"><span>\u26a0</span><span>Immagine non disponibile</span></div>'; };
+    imgEl.src = imgs[0];
+    frameFut.style.cursor = 'pointer';
+    frameFut.onclick = () => {
+      idx = (idx + 1) % imgs.length;
+      imgEl.style.opacity = '0';
+      setTimeout(() => { imgEl.src = imgs[idx]; }, 200);
+    };
+  } else {
+    loadImg('frame-fut', t.imgFut, 'Immagine futurista', t.imgFutPosition);
+  }
+  loadImg('frame-norm', t.imgNorm, 'Immagine reale', t.imgNormPosition);
+
+  // Indizio
+  document.getElementById('indizio-text').textContent = t.indizio;
+
+  // Audio NORMALE
+  ['norm', 'fut'].forEach(mode => {
+    const { player, btn, name } = audioEls(mode);
+    const src   = mode === 'norm' ? t.audioNorm : t.audioFut;
+    const label = mode === 'norm' ? (t.audioNormLabel || t.nome + ' — audio norm') : (t.audioFutLabel || t.nome + ' — audio fut');
+    player.pause(); btn.textContent = '▶';
+    if (src) {
+      player.src = src;
+      player.load(); // forza il reload esplicito (necessario su Safari/iOS)
+      name.textContent = label;
+    } else {
+      player.removeAttribute('src'); player.load();
+      name.textContent = t.nome + ' — caricare audio';
+    }
+  });
+
+  // Maps link
+  document.getElementById('maps-link').href =
+    `https://www.google.com/maps?q=${t.lat},${t.lng}&z=18`;
+
+  // Minigame
+  renderMinigame(idx);
+
+  // Nav
+  document.getElementById('btn-prev').disabled = idx === 0;
+  document.getElementById('btn-next').disabled = idx === tappe.length - 1;
+  document.getElementById('nav-counter').textContent = `${idx + 1} / ${tappe.length}`;
+
+  // Pulsante "VAI AL QUIZ" nell'ultima tappa — messaggio se quiz non ancora sbloccato
+  const quizWrap = document.getElementById('to-quiz-wrap');
+  if (idx === tappe.length - 1) {
+    quizWrap.style.display = 'block';
+    if (canAccessQuiz()) {
+      quizWrap.innerHTML = `<button class="btn-cta" onclick="showPage('quiz')" style="align-self:center;margin:0 auto">VAI AL QUIZ →</button>`;
+    } else {
+      const mancanti = tappe.length - Object.keys(miniCompleted).length;
+      quizWrap.innerHTML = `
+        <div class="quiz-locked-msg">
+          <div class="quiz-locked-msg-icon">🔒</div>
+          <div class="quiz-locked-msg-text">
+            Trova ancora <strong>${mancanti} indizio${mancanti === 1 ? '' : 'i'}</strong> per sbloccare il Quiz finale.<br>
+            <span style="font-size:0.78rem;opacity:0.65;">Rispondi correttamente al mini-gioco di ogni tappa.</span>
+          </div>
+        </div>`;
+    }
+  } else {
+    quizWrap.style.display = 'none';
+  }
+
+  // Reset mode: apre sempre in modalità futurista (default dell'app)
+  setMode('fut');
+
+  // Avvia il cronometro per il punteggio stelle (solo se non già completata)
+  if (!miniCompleted[idx]) {
+    tappaOpenTime = Date.now();
+    miniWrongAttempts[idx] = miniWrongAttempts[idx] || 0;
+  }
+}
+
+function navTappa(dir) { const next = currentTappa + dir; if (next >= 0 && next < tappe.length) openTappa(next); }
+
+function setMode(m) {
+  currentMode = m;
+  ['norm','fut'].forEach(v => {
+    const active = m === v;
+    document.getElementById('btn-' + v).classList.toggle('active', active);
+    document.getElementById('panel-' + v).classList.toggle('active', active);
+  });
+}
+
+function toggleAudio(mode) {
+  const other = mode === 'norm' ? 'fut' : 'norm';
+  const { player: op, btn: ob } = audioEls(other);
+  if (op && !op.paused) { op.pause(); ob.textContent = '▶'; }
+  const { player, btn } = audioEls(mode);
+  if (!player.hasAttribute('src')) return;
+  if (player.paused) { player.play(); btn.textContent = '■'; }
+  else { player.pause(); btn.textContent = '▶'; }
+}
+
+function resetAudioBtn(mode) {
+  audioEls(mode).btn.textContent = '▶';
+}
+
+function starsHtml(stars) {
+  return `<div class="mini-stars"><span class="mini-stars-label">Velocità</span>${[1,2,3].map(n => `<span class="star${n <= stars ? ' lit' : ''}" style="animation-delay:${(n-1)*0.12}s">⭐</span>`).join('')}</div>`;
+}
+
+function renderMinigame(idx) {
+  const t = tappe[idx];
+  const done = miniCompleted[idx];
+
+  document.getElementById('mini-stato').textContent = done ? '✓ completato' : '';
+  document.getElementById('mini-domanda').textContent = t.domanda;
+
+  const optsEl = document.getElementById('mini-opzioni');
+  optsEl.innerHTML = '';
+  t.opzioni.forEach((o, oi) => {
+    const btn = document.createElement('button');
+    btn.className = 'mini-opt';
+    btn.textContent = o;
+    if (done) {
+      // Mostra le opzioni disabilitate ed evidenzia la risposta corretta in verde
+      btn.disabled = true;
+      if (oi === t.corretta) btn.classList.add('correct');
+    } else { btn.onclick = () => answerMini(idx, oi); }
+    optsEl.appendChild(btn);
+  });
+
+  const fb = document.getElementById('mini-feedback');
+  const reveal = document.getElementById('mini-reveal');
+  const mirWord = document.getElementById('mir-word');
+  const spieg = document.getElementById('mini-spiegazione');
+
+  if (done) {
+    fb.className = 'mini-feedback ok';
+    fb.textContent = '✓ Risposta corretta! Parola-indizio sbloccata.';
+    // Mostra stelle
+    const s = miniStars[idx] || 1;
+    fb.innerHTML = '✓ Risposta corretta! Parola-indizio sbloccata.' + starsHtml(s);
+    spieg.className = 'mini-spiegazione show';
+    spieg.innerHTML = `<span class="mini-spiegazione-icon">💡</span>${t.spiegazione || ''}`;
+    reveal.classList.add('show');
+    mirWord.textContent = t.parola;
+  } else {
+    fb.className = 'mini-feedback';
+    fb.textContent = '';
+    spieg.className = 'mini-spiegazione';
+    spieg.innerHTML = '';
+    reveal.classList.remove('show');
+    mirWord.textContent = '';
+  }
+}
+
+function answerMini(idx, chosenOi) {
+  const t = tappe[idx];
+  const opts = document.querySelectorAll('#mini-opzioni .mini-opt');
+
+  const fb = document.getElementById('mini-feedback');
+  const reveal = document.getElementById('mini-reveal');
+  const spieg = document.getElementById('mini-spiegazione');
+
+  if (chosenOi === t.corretta) {
+    opts.forEach(b => b.disabled = true);
+    opts[chosenOi].classList.add('correct');
+    miniCompleted[idx] = true;
+    // ── Calcolo stelle ────────────────────────────────
+    const elapsed = tappaOpenTime ? (Date.now() - tappaOpenTime) / 1000 : 999;
+    const wrongs  = miniWrongAttempts[idx] || 0;
+    let stars;
+    if (wrongs > 0)       stars = 1;
+    else if (elapsed < 12) stars = 3;
+    else if (elapsed < 35) stars = 2;
+    else                   stars = 1;
+    miniStars[idx] = stars;
+    saveProgress();
+    fb.className = 'mini-feedback ok';
+    fb.textContent = '✓ Esatto! Hai sbloccato la parola-indizio.';
+    // Mostra spiegazione didattica
+    spieg.className = 'mini-spiegazione show';
+    spieg.innerHTML = `<span class="mini-spiegazione-icon">💡</span>${t.spiegazione || ''}`;
+    reveal.classList.add('show');
+    document.getElementById('mir-word').textContent = t.parola;
+    document.getElementById('mini-stato').textContent = '✓ completato';
+    // Aggiorna la visualizzazione delle stelle nel feedback
+    const _s = miniStars[idx] || 1;
+    fb.innerHTML = '✓ Esatto! Hai sbloccato la parola-indizio.' + starsHtml(_s);
+    // Vibrazione: pattern lungo se è l'ultima parola (celebration), breve altrimenti
+    const tuttiCompletati = tappe.every((_, i) => miniCompleted[i]);
+    safeVibrate(tuttiCompletati ? [100, 60, 100, 60, 200] : [60, 80, 60, 80, 120]);
+    // Celebration solo quando TUTTI i mini-giochi sono stati risposti correttamente
+    if (tuttiCompletati) {
+      setTimeout(showCelebration, 600);
+    }
+  } else {
+    opts[chosenOi].classList.add('wrong');
+    opts[chosenOi].disabled = true;
+    // Conta i tentativi errati per penalizzare le stelle
+    miniWrongAttempts[idx] = (miniWrongAttempts[idx] || 0) + 1;
+    saveProgress();
+    // Vibrazione breve per risposta errata
+    safeVibrate([30, 40, 30]);
+    fb.className = 'mini-feedback ko';
+    fb.textContent = '✗ Risposta errata. Riprova!';
+  }
+}
+
+// Ordine corretto: indici delle tappe nella sequenza giusta
+// Soluzione A → il(t1) colpevole(t4) è(t5) il(t6) pittore(t2) portogruarese(t0) Luigi Russolo(t3)
+const fraseCorretta = [1, 4, 5, 6, 2, 0, 3];
+// Soluzione B → il(t1) pittore(t2) portogruarese(t0) Luigi Russolo(t3) è(t5) il(t6) colpevole(t4)
+const fraseAlternativa = [1, 2, 0, 3, 5, 6, 4];
+
+// ordineUtente è dichiarato in cima con le altre variabili di stato
+
+function renderQuiz() {
+  const cont = document.getElementById('quiz-content');
+  cont.innerHTML = '';
+  // ordineUtente NON viene azzerato qui: viene ripristinato da loadProgress()
+  // e salvato ad ogni modifica. Si azzera solo con il pulsante "Ricomincia".
+
+  const intro = document.createElement('p');
+  intro.className = 'quiz-intro-text';
+  intro.textContent = 'Hai visitato i luoghi. Ora usa gli indizi raccolti — e le parole-indizio sbloccate — per risolvere il mistero del quadro scomparso.';
+  cont.appendChild(intro);
+
+  // Sezione parola mistero (mostra frammenti raccolti)
+  const parolaSection = document.createElement('div');
+  parolaSection.className = 'parola-section';
+  const allWords = tappe.map(t => t.parola);
+  parolaSection.innerHTML = `
+    <div class="parola-header"><div class="parola-header-title">🔑 PAROLE RACCOLTE</div></div>
+    <div class="parola-body">
+      <p class="parola-hint">Le parole che hai sbloccato durante il percorso. Riordinale per svelare il segreto.</p>
+      <div class="parola-pieces">${allWords.map((w, i) => `<div class="ppiece${miniCompleted[i] ? ' found' : ''}">${miniCompleted[i] ? w : '???'}</div>`).join('<div style="color:var(--rosso);font-size:1.1rem;align-self:center;padding:0 2px">·</div>')}</div>
+    </div>`;
+  cont.appendChild(parolaSection);
+
+  // Gioco riordino
+  const gameDiv = document.createElement('div');
+  gameDiv.className = 'ordine-section';
+  gameDiv.id = 'ordine-section';
+  gameDiv.innerHTML = `
+    <div class="ordine-header"><div class="ordine-header-title">🔍 RIORDINA LA FRASE</div></div>
+    <div class="ordine-body">
+      <p class="ordine-hint">Tocca le parole nell'ordine corretto per comporre la frase che svela il mistero. Tocca una parola già posizionata per toglierla.</p>
+      <div class="ordine-slot-wrap">
+        <div class="ordine-slots" id="ordine-slots"></div>
+      </div>
+      <div class="ordine-pool" id="ordine-pool"></div>
+      <div class="ordine-actions">
+        <button class="ordine-reset-btn" onclick="resetOrdine()">↺ Ricomincia</button>
+        <button class="ordine-submit-btn" id="ordine-submit-btn" onclick="submitOrdine()" disabled>VERIFICA →</button>
+      </div>
+      <div class="ordine-feedback" id="ordine-feedback"></div>
+    </div>`;
+  cont.appendChild(gameDiv);
+
+  renderOrdinePool();
+}
+
+function renderOrdinePool() {
+  const pool = document.getElementById('ordine-pool');
+  const slots = document.getElementById('ordine-slots');
+  const submitBtn = document.getElementById('ordine-submit-btn');
+  if (!pool || !slots) return;
+
+  const placedSet = new Set(ordineUtente);
+  const available = tappe.map((_, i) => i).filter(i => !placedSet.has(i));
+
+  pool.innerHTML = available.map(i =>
+    `<button class="ordine-chip available" onclick="placeWord(${i})">${tappe[i].parola}</button>`
+  ).join('');
+
+  slots.innerHTML = ordineUtente.map((ti, pos) =>
+    `<button class="ordine-chip placed" onclick="removeWord(${pos})">${tappe[ti].parola}</button>`
+  ).join('') + (ordineUtente.length < tappe.length
+    ? `<span class="ordine-slot-placeholder">tocca una parola…</span>` : '');
+
+  if (submitBtn) submitBtn.disabled = ordineUtente.length < tappe.length;
+}
+
+function placeWord(tappaIdx) {
+  if (ordineUtente.length >= tappe.length) return;
+  ordineUtente.push(tappaIdx);
+  saveProgress();
+  document.getElementById('ordine-feedback').innerHTML = '';
+  renderOrdinePool();
+}
+
+function removeWord(pos) {
+  ordineUtente.splice(pos, 1);
+  saveProgress();
+  document.getElementById('ordine-feedback').innerHTML = '';
+  renderOrdinePool();
+}
+
+function resetOrdine() {
+  ordineUtente = [];
+  saveProgress();
+  // Riabilita i chip se erano stati bloccati dopo verifica
+  renderOrdinePool();
+  document.getElementById('ordine-feedback').innerHTML = '';
+}
+
+function submitOrdine() {
+  if (ordineUtente.length < tappe.length) return;
+  // Confronta per testo della parola, non per indice tappa:
+  // i due "il" (tappa 1 e tappa 6) sono intercambiabili.
+  // Sono accettate entrambe le soluzioni (A e B).
+  const matchSeq = (seq) => ordineUtente.every((ti, pos) =>
+    tappe[ti].parola === tappe[seq[pos]].parola
+  );
+  const correctA = matchSeq(fraseCorretta);
+  const correctB = matchSeq(fraseAlternativa);
+  const correct  = correctA || correctB;
+  const refSeq   = correctA ? fraseCorretta : (correctB ? fraseAlternativa : fraseCorretta);
+  const fb = document.getElementById('ordine-feedback');
+
+  // Colora i chip posizionati (usa la sequenza di riferimento corretta)
+  document.querySelectorAll('#ordine-slots .ordine-chip').forEach((chip, pos) => {
+    const ok = tappe[ordineUtente[pos]].parola === tappe[refSeq[pos]].parola;
+    chip.classList.add(ok ? 'correct' : 'wrong');
+    chip.disabled = true;
+  });
+  document.querySelectorAll('#ordine-pool .ordine-chip').forEach(c => c.disabled = true);
+  document.getElementById('ordine-submit-btn').disabled = true;
+
+  if (correct) {
+    // Vibrazione celebrativa: pattern festoso per il completamento del quiz
+    safeVibrate([120, 60, 120, 60, 300]);
+    fb.innerHTML = `
+      <div class="ordine-fb-ok">✓ Esatto! Hai scoperto il segreto di Russolo.</div>
+      <button class="btn-cta" onclick="showPage('riepilogo')" style="margin:1rem auto 0;display:block">VEDI IL CERTIFICATO 🏆</button>`;
+  } else {
+    // Vibrazione breve per risposta errata
+    safeVibrate([40, 50, 40]);
+    fb.innerHTML = `
+      <div class="ordine-fb-ko">✗ L'ordine non è corretto. Rileggi gli indizi e riprova!</div>
+      <button class="ordine-reset-btn" style="margin-top:0.7rem" onclick="resetOrdine()">↺ Riprova</button>`;
+  }
+  fb.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── RIEPILOGO / CERTIFICATO ────────────────────────
+function renderRiepilogo() {
+  const visitedCount = visited.size;
+  const miniCount    = Object.keys(miniCompleted).length;
+  // Aggiorna la statistica tappe
+  const statNums = document.querySelectorAll('.cert-stat-num');
+  if (statNums[0]) statNums[0].textContent = Math.max(visitedCount, tappe.length);
+  if (statNums[1]) statNums[1].textContent = miniCount;
+  // Mostra data odierna nel footer
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
+  const footerRight = document.querySelector('.cert-footer-right');
+  if (footerRight) footerRight.textContent = '✓ ' + dateStr;
+
+  // ── Stelle totali ─────────────────────────────────
+  const starsTotal = document.getElementById('cert-total-stars');
+  if (starsTotal) {
+    const totalStars = tappe.reduce((sum, _, i) => sum + (miniStars[i] || 0), 0);
+    const maxStars = tappe.length * 3;
+    starsTotal.textContent = `Punteggio totale: ${totalStars} / ${maxStars} ⭐`;
+  }
+}
+
+function downloadCertificate() {
+  const canvas = document.getElementById('cert-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Sfondo
+  ctx.fillStyle = '#1e1812';
+  ctx.fillRect(0, 0, W, H);
+
+  // Bordo oro
+  ctx.strokeStyle = '#c9890a';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(6, 6, W - 12, H - 12);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(201,137,10,0.35)';
+  ctx.strokeRect(14, 14, W - 28, H - 28);
+
+  // Header band
+  ctx.fillStyle = '#2a1e14';
+  ctx.fillRect(0, 0, W, 160);
+  ctx.strokeStyle = '#c9890a';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(0, 160); ctx.lineTo(W, 160); ctx.stroke();
+
+  // Testo header
+  ctx.fillStyle = 'rgba(201,137,10,0.7)';
+  ctx.font = '700 11px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('⚡  PASSEGGIATA FUTURISTA · PORTOGRUARO  ⚡', W / 2, 38);
+
+  ctx.fillStyle = '#f4ede0';
+  ctx.font = 'italic 700 40px Georgia, serif';
+  ctx.fillText('Certificato di completamento', W / 2, 90);
+
+  ctx.fillStyle = 'rgba(244,237,224,0.38)';
+  ctx.font = '700 13px sans-serif';
+  ctx.fillText('PERCORSO LUIGI RUSSOLO · PORTOGRUARO', W / 2, 122);
+
+  // Linea divisoria ornamentale
+  ctx.fillStyle = '#d63c1e';
+  ctx.fillRect(W / 2 - 30, 148, 60, 2);
+
+  // Statistiche dinamiche (stesse di renderRiepilogo)
+  const stats = [
+    { num: String(Math.max(visited.size, tappe.length)), label: 'TAPPE PERCORSE' },
+    { num: String(Object.keys(miniCompleted).length),    label: 'INDIZI TROVATI' },
+    { num: '1',                                          label: 'MISTERO RISOLTO' },
+  ];
+  const boxW = 160, boxH = 80, gap = 20;
+  const totalW = stats.length * boxW + (stats.length - 1) * gap;
+  const startX = (W - totalW) / 2;
+  const boxY = 185;
+  stats.forEach((s, i) => {
+    const bx = startX + i * (boxW + gap);
+    ctx.fillStyle = '#14100c';
+    ctx.strokeStyle = '#3a3028';
+    ctx.lineWidth = 1;
+    roundRect(ctx, bx, boxY, boxW, boxH, 8);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#c9890a';
+    ctx.font = 'bold 34px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(s.num, bx + boxW / 2, boxY + 46);
+    ctx.fillStyle = 'rgba(244,237,224,0.4)';
+    ctx.font = '700 10px sans-serif';
+    ctx.fillText(s.label, bx + boxW / 2, boxY + 66);
+  });
+
+  // Linea
+  ctx.strokeStyle = '#3a3028';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(40, 295); ctx.lineTo(W - 40, 295); ctx.stroke();
+
+  // Frase conclusiva (area precedentemente vuota tra y=295 e footer)
+  ctx.fillStyle = 'rgba(201,137,10,0.18)';
+  ctx.fillRect(40, 320, W - 80, 130);
+  ctx.strokeStyle = 'rgba(201,137,10,0.35)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(40, 320, W - 80, 130);
+
+  ctx.fillStyle = '#d63c1e';
+  ctx.fillRect(40, 320, 4, 130);
+
+  ctx.fillStyle = '#f5e4b0';
+  ctx.font = 'italic 700 20px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('"Il vero quadro futurista non è su una parete.', W / 2, 368);
+  ctx.fillText('È la città stessa."', W / 2, 400);
+
+  // Punteggio stelle
+  const totalStarsCanvas = tappe.reduce((sum, _, i) => sum + (miniStars[i] || 0), 0);
+  const maxStarsCanvas = tappe.length * 3;
+  ctx.fillStyle = 'rgba(201,137,10,0.12)';
+  ctx.fillRect(40, 468, W - 80, 36);
+  ctx.strokeStyle = 'rgba(201,137,10,0.3)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(40, 468, W - 80, 36);
+  ctx.fillStyle = '#c9890a';
+  ctx.font = '700 13px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('Punteggio totale: ' + totalStarsCanvas + ' / ' + maxStarsCanvas + ' ⭐', W / 2, 491);
+
+  // Footer
+  ctx.fillStyle = '#14100c';
+  ctx.fillRect(0, H - 50, W, 50);
+  ctx.strokeStyle = 'rgba(201,137,10,0.3)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H - 50); ctx.lineTo(W, H - 50); ctx.stroke();
+  ctx.fillStyle = 'rgba(244,237,224,0.28)';
+  ctx.font = '700 10px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('Classe 2^E · 2026', 40, H - 20);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#c9890a';
+  const today = new Date();
+  ctx.fillText('✓ ' + today.toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' }), W - 40, H - 20);
+
+  // Download
+  const link = document.createElement('a');
+  link.download = 'certificato-passeggiata-futurista.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function buildNavItems() {
+  const container = document.getElementById('nav-items');
+  container.innerHTML = '';
+
+  const activePage = document.querySelector('.page.active')?.id || 'home';
+
+  function addLabel(text) {
+    const el = document.createElement('div');
+    el.className = 'nav-section-label';
+    el.textContent = text;
+    container.appendChild(el);
+  }
+  function addItem(icon, label, sub, pageId, onClick) {
+    const el = document.createElement('button');
+    el.className = 'nav-item' + (activePage === pageId ? ' active-nav' : '');
+    el.innerHTML = `<div class="nav-item-icon">${icon}</div><div><div class="nav-item-label">${label}</div><div class="nav-item-sub">${sub}</div></div>`;
+    el.addEventListener('click', onClick);
+    container.appendChild(el);
+  }
+  function addDivider() {
+    const el = document.createElement('div');
+    el.className = 'nav-divider';
+    container.appendChild(el);
+  }
+  addLabel('Principale');
+  addItem('🏠', 'Home', 'Pagina iniziale', 'home', () => { closeNav(); showPage('home'); });
+  addItem('🗺️', 'Le 7 tappe', 'Percorso completo', 'percorso', () => { closeNav(); showPage('percorso'); });
+
+  // Quiz — bloccato finché non si completano tutti i mini-giochi
+  const quizUnlocked = canAccessQuiz();
+  const quizEl = document.createElement('button');
+  quizEl.className = 'nav-item' + (activePage === 'quiz' ? ' active-nav' : '') + (!quizUnlocked ? ' nav-item-locked' : '');
+  quizEl.innerHTML = `
+    <div class="nav-item-icon" style="${!quizUnlocked ? 'opacity:0.4;' : ''}">${quizUnlocked ? '🔍' : '🔒'}</div>
+    <div>
+      <div class="nav-item-label" style="${!quizUnlocked ? 'opacity:0.45;' : ''}">Quiz finale</div>
+      <div class="nav-item-sub">${quizUnlocked ? 'Risolvi il mistero' : `${Object.keys(miniCompleted).length} / ${tappe.length} indizi trovati`}</div>
+    </div>`;
+  quizEl.addEventListener('click', () => {
+    closeNav();
+    if (quizUnlocked) { showPage('quiz'); } else { showQuizLocked(); }
+  });
+  container.appendChild(quizEl);
+
+  addItem('❓', "Guida all'utilizzo", 'Come usare l\'app', 'guida', () => { closeNav(); showPage('guida'); });
+  addItem('◈', 'Credits', 'Il team del progetto', 'credits', () => { closeNav(); showPage('credits'); });
+
+  addDivider();
+
+  // Toggle Desktop / Mobile
+  const vmtLabel = document.createElement('div');
+  vmtLabel.className = 'nav-section-label';
+  vmtLabel.textContent = 'Visualizzazione';
+  container.appendChild(vmtLabel);
+
+  const vmtRow = document.createElement('div');
+  vmtRow.className = 'view-mode-toggle';
+  const isDesktop = document.body.classList.contains('desktop');
+  vmtRow.innerHTML = `
+    <button class="vmt-btn${!isDesktop ? ' vmt-active' : ''}" onclick="setViewMode('mobile')">📱 Mobile</button>
+    <button class="vmt-btn${isDesktop ? ' vmt-active' : ''}" onclick="setViewMode('desktop')">🖥 Desktop</button>`;
+  container.appendChild(vmtRow);
+
+  addDivider();
+  const resetEl = document.createElement('button');
+  resetEl.className = 'nav-item';
+  resetEl.innerHTML = `<div class="nav-item-icon">↺</div><div><div class="nav-item-label">Azzera progressi</div><div class="nav-item-sub">Ricomincia da zero</div></div>`;
+  resetEl.addEventListener('click', () => { closeNav(); resetProgress(); });
+  container.appendChild(resetEl);
+
+  addDivider();
+  addLabel('Tappe');
+
+  tappe.forEach((t, i) => {
+    const isActive = activePage === 'tappa' && currentTappa === i;
+    const el = document.createElement('button');
+    el.className = 'nav-item' + (isActive ? ' active-nav' : '');
+    el.innerHTML = `<div class="nav-item-icon">${t.emoji}</div><div><div class="nav-item-label">${t.nome}</div><div class="nav-item-sub">Tappa ${t.num}${visited.has(i) ? ' · visitata' : ''}</div></div>`;
+    el.addEventListener('click', () => { closeNav(); openTappa(i); });
+    container.appendChild(el);
+  });
+}
+
+function openNav() {
+  buildNavItems();
+  document.getElementById('nav-drawer').classList.add('open');
+}
+
+function closeNav() {
+  document.getElementById('nav-drawer').classList.remove('open');
+}
+
+// ── QUIZ BLOCCATO ──────────────────────────────────
+function canAccessQuiz() {
+  return tappe.every((_, i) => miniCompleted[i]);
+}
+
+function showQuizLocked() {
+  const prog = document.getElementById('qlt-progress');
+  prog.innerHTML = tappe.map((_, i) => {
+    const cls = miniCompleted[i] ? 'done' : 'missing';
+    return `<div class="qlt-pip ${cls}" title="Tappa ${i+1}"></div>`;
+  }).join('');
+  document.getElementById('quiz-locked-toast').classList.add('show');
+}
+
+function closeQuizLocked() {
+  document.getElementById('quiz-locked-toast').classList.remove('show');
+  showPage('percorso');
+}
+
+
+// ── MODALITÀ VISUALIZZAZIONE ───────────────────────
+function applyViewMode(mode) {
+  document.body.classList.toggle('desktop', mode === 'desktop');
+}
+
+function setViewMode(mode) {
+  try { localStorage.setItem('pf_viewMode', mode); } catch(e) {}
+  applyViewMode(mode);
+  // Aggiorna i pulsanti nel drawer senza ricostruirlo tutto
+  document.querySelectorAll('.vmt-btn').forEach(btn => {
+    btn.classList.toggle('vmt-active',
+      (mode === 'desktop' && btn.textContent.includes('Desktop')) ||
+      (mode === 'mobile'  && btn.textContent.includes('Mobile'))
+    );
+  });
+}
+
+// Carica la preferenza salvata
+(function() {
+  try {
+    const saved = localStorage.getItem('pf_viewMode');
+    if (saved) applyViewMode(saved);
+  } catch(e) {}
+})();
+
+// ── VIBRAZIONE ─────────────────────────────────────
+// navigator.vibrate non è supportato su iOS (WebKit).
+// safeVibrate() tenta la vibrazione hardware e, se non disponibile
+// o se il browser lancia un'eccezione, innesca un breve flash visivo
+// come feedback alternativo.
+function safeVibrate(pattern) {
+  let vibrated = false;
+  if (navigator.vibrate) {
+    try { navigator.vibrate(pattern); vibrated = true; } catch(e) {}
+  }
+  if (!vibrated) {
+    document.body.classList.remove('vibe-flash');
+    void document.body.offsetWidth; // forza reflow per riavviare l'animazione
+    document.body.classList.add('vibe-flash');
+    setTimeout(() => document.body.classList.remove('vibe-flash'), 400);
+  }
+}
+
+// ── GEOLOCALIZZAZIONE ──────────────────────────────
+// Un unico watchPosition viene avviato all'avvio dell'app e rimane attivo
+// per tutta la sessione. Le singole tappe leggono l'ultima posizione nota.
+let lastCoords = null;
+let geoUpdateInterval = null;
+let geoWatchId = null; // Fix Bug 3: salviamo l'ID per poter chiamare clearWatch()
+
+function initGeo() {
+  if (!navigator.geolocation) return;
+  geoWatchId = navigator.geolocation.watchPosition(
+    pos => { lastCoords = pos.coords; },
+    // Fix Bug 4: errore transiente non azzera più lastCoords,
+    // così il badge mantiene l'ultima posizione valida nota
+    () => { /* lastCoords invariato */ },
+    // Fix Bug 5: timeout evita attesa indefinita senza callback di errore
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+  );
+}
+
+function startGeo(tappaIdx) {
+  const wrap = document.getElementById('geo-badge-wrap');
+  if (!wrap || !navigator.geolocation) { if (wrap) wrap.innerHTML = ''; return; }
+
+  // Fix Bug 3: se il watcher è stato fermato da stopGeo, lo riavviamo
+  if (geoWatchId === null) initGeo();
+
+  if (geoUpdateInterval !== null) clearInterval(geoUpdateInterval);
+
+  function updateBadge() {
+    if (!lastCoords) {
+      wrap.innerHTML = `<div class="geo-badge loading"><div class="geo-dot"></div>Rilevamento posizione…</div>`;
+      return;
+    }
+    const t = tappe[tappaIdx];
+    const dist = getDistanceM(lastCoords.latitude, lastCoords.longitude, t.lat, t.lng);
+    if (dist < 80) {
+      wrap.innerHTML = `<div class="geo-badge near"><div class="geo-dot"></div>Sei vicino a questa tappa! (${Math.round(dist)} m)</div>`;
+    } else if (dist < 400) {
+      // Fix Bug 6: fascia 80–400 m → badge giallo (.warning), non grigio (.far)
+      wrap.innerHTML = `<div class="geo-badge warning"><div class="geo-dot"></div>A ${Math.round(dist)} m da questa tappa</div>`;
+    } else {
+      wrap.innerHTML = `<div class="geo-badge far"><div class="geo-dot"></div>Distanza: ${(dist/1000).toFixed(1)} km</div>`;
+    }
+  }
+
+  updateBadge();
+  geoUpdateInterval = setInterval(updateBadge, 5000);
+}
+
+function stopGeo() {
+  if (geoUpdateInterval !== null) { clearInterval(geoUpdateInterval); geoUpdateInterval = null; }
+  // Fermiamo solo l'intervallo di aggiornamento badge e il watcher;
+  // lastCoords NON viene azzerato: così alla riapertura della tappa successiva
+  // non compare il flash "Rilevamento posizione…" se il GPS era già acquisito.
+  if (geoWatchId !== null) {
+    navigator.geolocation.clearWatch(geoWatchId);
+    geoWatchId = null;
+    // lastCoords mantenuto deliberatamente per evitare re-acquisizione GPS
+  }
+  const wrap = document.getElementById('geo-badge-wrap');
+  if (wrap) wrap.innerHTML = '';
+}
+
+function getDistanceM(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// ── CELEBRATION ────────────────────────────────────
+// celebrationShown è dichiarata in cima con le altre variabili di stato
+
+function showCelebration() {
+  if (celebrationShown) return;
+  celebrationShown = true;
+  launchSparks();
+  document.getElementById('celebration').classList.add('show');
+}
+
+function closeCelebration() {
+  document.getElementById('celebration').classList.remove('show');
+  showPage('quiz');
+}
+
+function launchSparks() {
+  const container = document.getElementById('cel-sparks');
+  container.innerHTML = '';
+  const colors = ['#d63c1e','#c9890a','#f5e4b0','#fff'];
+  for (let i = 0; i < 28; i++) {
+    const s = document.createElement('div');
+    const size = 6 + Math.random() * 8;
+    const tx = (Math.random() - 0.5) * window.innerWidth * 1.4;
+    const ty = -(100 + Math.random() * window.innerHeight);
+    const delay = Math.random() * 0.5;
+    s.style.cssText = `
+      position:absolute; left:50%; top:70%;
+      width:${size}px; height:${size}px;
+      border-radius:${Math.random()>0.5?'50%':'2px'};
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      --tx:${tx}px; --ty:${ty}px;
+      animation: sparkFly 1.2s ${delay}s ease-out both;
+    `;
+    container.appendChild(s);
+  }
+}
+
+// ── SPLASH SCREEN ──────────────────────────────────
+(function() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  // Dopo 4.7s avvia il fade-out (la barra si riempie in 4.5s + 0.5s delay = 5s totali)
+  setTimeout(() => {
+    splash.classList.add('fade-out');
+    // Rimuovi dal DOM dopo la transizione (0.8s)
+    setTimeout(() => { splash.style.display = 'none'; }, 820);
+  }, 4700);
+})();
+
+renderPercorso();
+initGeo();
+
+// ── AGGIORNA TESTI CON NUMERO TAPPE DINAMICO ───────
+(function() {
+  const n = tappe.length;
+  const cel = document.getElementById('cel-sub-text');
+  if (cel) cel.innerHTML = `Hai visitato tutte e ${n} le tappe.<br>Ora puoi risolvere il mistero del quadro scomparso.`;
+  const g2 = document.getElementById('guida-step2-text');
+  if (g2) g2.innerHTML = `Visualizzi una griglia con le <strong>${n} tappe</strong> del percorso. Tocca una card per aprire la pagina del luogo. Le tappe già visitate mostrano un <strong>segno di spunta ✓</strong> dorato.`;
+  const g7 = document.getElementById('guida-step7-text');
+  if (g7) g7.innerHTML = `Ogni mini-gioco completato correttamente sblocca una <strong>parola-indizio</strong> della tappa. Quando tutte e ${n} le parole sono sbloccate, nel quiz apparirà la <strong>frase segreta</strong> che svela l'identità del colpevole — e la soluzione narrativa del mistero.`;
+})();
+
+// ── SERVICE WORKER (PWA) ───────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW registrato:', reg.scope))
+      .catch(err => console.warn('SW fallito:', err));
+  });
+}
+
+const _creditsImgs = ["https://i.imgur.com/XnyVp2j.jpg", "https://i.imgur.com/7KgklpE.jpg"];
+let _creditsImgIdx = 0;
+function toggleCreditsImg() {
+  _creditsImgIdx = (_creditsImgIdx + 1) % _creditsImgs.length;
+  const img = document.getElementById('credits-toggle-img');
+  if (!img) return;
+  img.style.opacity = '0';
+  setTimeout(() => {
+    img.src = _creditsImgs[_creditsImgIdx];
+    img.style.opacity = '1';
+  }, 150);
+}
+</script>
+</body>
+</html>
